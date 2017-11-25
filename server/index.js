@@ -19,6 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // initialize the database with a yelp query for 1000 SF restaurants
 seedDatabase();
 
+
 app.get('/data', (request, response) => {
   // GETS SF DATA AS INITIAL SEED
   getRestaurantsByCity()
@@ -113,6 +114,11 @@ app.get('/phone', (req, res) => {
 });
 
 app.listen(PORT, () => { console.log(`Server listening on port ${PORT}`); });
+
+
+
+
+
 
 
 

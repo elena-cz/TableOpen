@@ -44,3 +44,4 @@ const getRestaurantsByCity = (cityAndState = 'San Francisco, CA', page = 0) => {
 module.exports = {
   getRestaurantsByCity,
 };
+
