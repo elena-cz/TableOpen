@@ -10,7 +10,7 @@ const RestaurantEntry = props =>
       <img width="210px" height="170px" src={props.restaurant.image_url} alt="pic of restaurant" />
       {props.restaurant.reservations.map(reservation =>
         (
-          <div key={reservation.time}>{
+          <div key={reservation.id}>{
           (moment(reservation.time).format('LT') === props.time || props.time === 'All')
           && (reservation.people.toString() === props.party || props.party === 'All')
           && <ReservationEntry key={reservation.time} reservation={reservation} />

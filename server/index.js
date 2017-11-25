@@ -76,7 +76,6 @@ app.post('/data/city', (request, response) => {
   }
 });
 
-
 app.post('/book', (req, res) => {
   // Route for booking a reservation
 
@@ -114,3 +113,26 @@ app.get('/phone', (req, res) => {
 });
 
 app.listen(PORT, () => { console.log(`Server listening on port ${PORT}`); });
+
+
+
+// const reservations = [{
+//   time: '2017-11-20T19:30:00Z',
+//   people: 7
+// }, {
+//   time: '2017-11-20T20:00:00Z',
+//   people: 3
+// }
+// ];
+
+// const data = _.map(results.data.businesses, (res) => {
+//   const output = {
+//     name: res.name,
+//     image_url: res.image_url,
+//     reservations: reservations,
+//     partySizes: reservations.map((slot) => {return slot.people}),
+//     times: reservations.map((slot) => {return moment(slot.time).format('LT')}),
+//     categories: res.categories.map((slot) => {return slot.title})
+//   };
+//   return output;
+// });
