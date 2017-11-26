@@ -14,8 +14,7 @@ class App extends React.Component {
       times: [],
       partySizes: [],
       categories: [],
-      myReservations: [1, 2, 3, 4, 5],
-      // filter: true,
+      myReservations: [{ id: 1}, { id: 2}, { id: 3}, { id: 4}, { id: 5}],
       time: 'All',
       party: 'All',
       category: 'All',
@@ -24,6 +23,7 @@ class App extends React.Component {
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
     this.onPhoneNumberSubmitClick = this.onPhoneNumberSubmitClick.bind(this);
     this.onCitySubmitClick = this.onCitySubmitClick.bind(this);
+    this.onCancelClick = this.onCancelClick.bind(this);
   }
 
   componentWillMount() {
@@ -106,12 +106,24 @@ class App extends React.Component {
   }
 
 
-  onAcceptClick() {
+  onAcceptClick(id, time, party, restaurant) {
     // send data to db and repopulate my reservation list
+    console.log(id, time, party, restaurant);
+
+    // update reservation with a phone number
+    // add reservation to myReservations
+    // re-query db for all available reservations
+
   }
 
-  onCancelClick() {
+  onCancelClick(index, id) {
     // send data to bd and repopulate my reservation list
+    console.log(index, id);
+
+    // update reservation and remove phonenumber on it
+    // remove reservation from myReservations
+    // re-query db for all available reservations
+
   }
 
   filterData() {
@@ -161,7 +173,8 @@ class App extends React.Component {
             time={this.state.time}
             party={this.state.party}
           />
-          <Myreservations reservations={this.state.myReservations} />
+          <Myreservations reservations={this.state.myReservations}
+            onCancelClick={this.onCancelClick} />
         </div>
       </div>
     );

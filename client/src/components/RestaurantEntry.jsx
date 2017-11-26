@@ -13,7 +13,11 @@ const RestaurantEntry = props =>
           <div key={reservation.id}>{
           (moment(reservation.time).format('LT') === props.time || props.time === 'All')
           && (reservation.people.toString() === props.party || props.party === 'All')
-          && <ReservationEntry key={reservation.time} reservation={reservation} />
+          && <ReservationEntry key={reservation.time} 
+            restaurant={props.restaurant.name} 
+            reservation={reservation} 
+            accept={props.onAcceptClick}
+          />
           }
           </div>))}
     </div>);

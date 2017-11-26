@@ -12,7 +12,7 @@ class Myreservations extends React.Component {
       <div className="myReservations">
       My Reservations
       {this.props.reservations.map((reservation, idx) => {
-        return (<Myreservation reservation={reservation} key={idx} />);
+        return (<Myreservation reservation={reservation} key={idx} index={idx} cancel={this.props.onCancelClick} />);
       })}
       </div>);
   }
