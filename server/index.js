@@ -1,11 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const yelp = require('../helpers/yelpApi.js');
+const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
 // const twilio = require('../helpers/twilioApi.js');
-const _ = require('underscore');
+// const _ = require('underscore');
 const path = require('path');
-const moment = require('moment');
+// const moment = require('moment');
 const { seedNewCity, queryCity } = require('../database/index.js');
+const { seedDatabase, formatCityResults } = require('../helpers/utils.js');
 
 const PORT = 3000;
 const app = express();
@@ -15,59 +16,19 @@ app.use(express.static(path.join(__dirname, '/../client/dist')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// initialize the database with a pull for SF restaurants
-
-let cityData = [];
-
-const seedParialData = (location, pageNumber) => new Promise((resolve, reject) => {
-  yelp.getRestaurantsByCity(location, pageNumber)
-    .then(partialResults => {
-    	// console.log('this is what comes back from yelp: ', partialResults);
-      cityData = cityData.concat(partialResults.data.businesses);
-      resolve(partialResults);
-    })
-    .catch(err => reject(err));
-});
-
-const SEED = (location = 'San Francisco, CA') => {
-  const completeCityData = [];
-  for (let i = 0; i < 20; i += 1) {
-    completeCityData.push(seedParialData(location, i));
-  }
-  Promise.all(completeCityData)
-    .then(() => {
-    	seedNewCity(cityData);
-    	console.log(`Number of restaurants in DB for ${location}: ', ${cityData.length}`);
-  });
-};
-
-Promise.resolve(SEED())
-  .then(() => {
-    console.log('go check the DB for SF');
-  });
-
-// const cityData = [];
-// Promise.resolve(yelp.getRestaurantsByCity('San Francisco, CA', i))
-//   .then((partialResults) => {
-//   	cityData.push(partialResults);
-//   })
-
-// Promise.all(testArray)
-//   .then((haha) => {
-//     console.log('alooasdfadsf');
-//     console.log(haha);
-//   });
-
+// initialize the database with a yelp query for 1000 SF restaurants
+seedDatabase();
 
 app.get('/data', (request, response) => {
-  yelp.getRestaurantsByCity()
-    .then((yelpResults) => {
-      seedNewCity(yelpResults.data.businesses)
+  // GETS SF DATA AS INITIAL SEED
+  getRestaurantsByCity()
+    .then((results) => {
+      seedNewCity(results.data.businesses)
         .then(() => {
           queryCity()
             .then((cityResults) => {
-              response.send(cityResults.rows);
-
+              const data = formatCityResults(cityResults);
+              response.send(data);
             })
             .catch((err) => {
               throw err;
@@ -76,34 +37,43 @@ app.get('/data', (request, response) => {
         .catch((err) => {
           throw err;
         });
-
-
-      const reservations = [{
-        time: '2017-11-20T19:30:00Z',
-        people: 7
-      }, {
-        time: '2017-11-20T20:00:00Z',
-        people: 3
-      }
-      ];
-
-      const data = _.map(yelpResults.data.businesses, (res) => {
-        const output = {
-          name: res.name,
-          image_url: res.image_url,
-          reservations: reservations,
-          partySizes: reservations.map((slot) => {return slot.people}),
-          times: reservations.map((slot) => {return moment(slot.time).format('LT')}),
-          categories: res.categories.map((slot) => {return slot.title})
-        };
-        return output;
-      });
-
-
-      // response.send(data);
     }).catch((err) => {
-      console.log('error', err);
+      throw err;
     });
+});
+
+app.post('/data/city', (request, response) => {
+  // Route for getting restaurants for particular city
+  // Check visited cities array to see if we have already found it
+  if (visitedCities.indexOf(request.body.city) < 0) {
+    getRestaurantsByCity(request.body.city)
+      .then((results) => {
+        // console.log('DATA FOR ', request.body.city);
+        seedNewCity(results.data.businesses)
+          .then(() => {
+            queryCity()
+              .then((cityResults) => {
+                // console.log('DENVER ', cityResults);
+                const data = formatCityResults(cityResults);
+                response.send(data);
+              })
+              .catch((err) => {
+                throw err;
+              });
+          })
+          .catch((err) => {
+            throw err;
+          });
+      })
+      .catch((err) => {
+        throw err;
+      });
+  } else {
+    const data = sampleData.massagedDataYelp.businesses;
+    // retrieve from db
+    // send to client
+    response.send();
+  }
 });
 
 
@@ -112,7 +82,10 @@ app.post('/book', (req, res) => {
 
   // req.body should contain a reservation id, and phone number
 
-  // add phone number to reservation and change 
+  // add phone number to reservation and update DB in three spots:
+  // 1) create the customer in the customers table if they don't already exist
+  // 2A) update reservation in reservations table to show as booked
+  // 2B) while also assigning the customer id appropriately
 
   res.send();
 });
@@ -122,7 +95,7 @@ app.put('/cancel', (req, res) => {
 
   // req.body should contain a reservation id
 
-  // remove phone number from reservation 
+  // remove phone number from reservation
 
   res.send();
 });
@@ -133,7 +106,7 @@ app.get('/phone', (req, res) => {
 
   // req.body sould contain phone number
 
-  //query db for all reservations linked to PN
+  // query db for all reservations linked to PN
 
   // send back array of reservaitons
 

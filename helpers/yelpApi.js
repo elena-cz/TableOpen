@@ -1,18 +1,31 @@
 const axios = require('axios');
 const config = require('./config.js');
 
-// Request format = http://opentable.herokuapp.com/api/{endpoint}?{parameter}
+/*
 
-// First do a POST Request to get the access_token https://api.yelp.com/oauth2/token?client_id={client_id}&client_secret={client_secret}
-// The response will have an access_token in the response body
-// To use this token in the request headers, we must specify an auth key like so:
+How to use the YELP API:
+(Note that we used the API's 3rd version, aka 'Yelp Fusion')
 
-// headers: {
-//   authorization: 'Bearer <access_token>?'
-// }
+1) Do a POST Request to this address to get your access_token:
+   https://api.yelp.com/oauth2/token?client_id={client_id}&client_secret={client_secret}
 
-// Now, use this header to make GET reqeusts to the following URL:
-// https://api.yelp.com/v3/businesses/search?location=San+Francisco&term=restaurants
+   The response body will have an 'access_token' that you'll need to send with every API query.
+   This token will go in the request header - we must specify an authorization key, like so:
+
+   headers: {
+     authorization: 'Bearer <insert_your_access_token_here>',
+   }
+
+2) Now, attach this header when you send GET reqeusts to the following URL:
+   https://api.yelp.com/v3/businesses/search?location={}&term=restaurants&limit={}&offset={}
+     where location value = 'city+state'
+     where limit = 50 (that's the max values that Yelp allows per GET request)
+     where offset = the page of results you want to see
+
+For additional information please visit:
+https://www.yelp.com/developers/documentation/v3
+
+*/
 
 const access = config.YELP_ACCESS_TOKEN;
 const yelpHeaders = {
@@ -22,30 +35,12 @@ const yelpHeaders = {
 };
 
 const getRestaurantsByCity = (cityAndState = 'San Francisco, CA', page = 0) => {
-  const cityState = cityAndState.split(',');
   const offset = page * 50;
-  const city = cityState[0];
-  const state = cityState[1];
-  const cityArr = city.split(' ');
-  const parsedCity = cityArr.join('+');
-  let pCandS = '';
-  if (state === undefined) {
-    pCandS = parsedCity;
-  } else {
-    pCandS = `${parsedCity},+ ${state}`;
-  }
-  return axios.get(`https://api.yelp.com/v3/businesses/search?location=${pCandS}&term=restaurants&limit=50&offset=${offset}`, yelpHeaders);
-};
-
-const getRestaurantInCity = (Restaurant, City) => {
-  const cityArr = City.split(' ');
-  const parsedCity = cityArr.join('+');
-  const restaurantArr = Restaurant.split(' ');
-  const parsedRes = restaurantArr.join('+');
-  return axios.get(`https://api.yelp.com/v3/businesses/search?location=${parsedCity}&term=${parsedRes}`, yelpHeaders);
+  const parsedCityAndState = cityAndState.split(', ');
+  const locationQuery = `${parsedCityAndState[0].split(' ').join('+')},+${parsedCityAndState[1]}`;
+  return axios.get(`https://api.yelp.com/v3/businesses/search?location=${locationQuery}&term=restaurants&limit=50&offset=${offset}`, yelpHeaders);
 };
 
 module.exports = {
   getRestaurantsByCity,
-  getRestaurantInCity,
 };
