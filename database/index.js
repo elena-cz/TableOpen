@@ -1,7 +1,7 @@
 const postgres = require('pg');
 const moment = require('moment');
 
-const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/tableopen1';
+const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/tableopen';
 
 const client = new postgres.Client({
   connectionString,
