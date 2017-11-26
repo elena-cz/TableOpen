@@ -11,8 +11,14 @@ class Myreservations extends React.Component {
     return (
       <div className="myReservations">
       My Reservations
-      {this.props.reservations.map((reservation, idx) => {
-        return (<Myreservation reservation={reservation} key={idx} index={idx} cancel={this.props.onCancelClick} />);
+      {(this.props.reservations.length === 0) ? 
+        <div>No Reservations</div> : this.props.reservations.map((reservation, idx) => {
+        return (
+          <Myreservation reservation={reservation} 
+            key={idx} 
+            index={idx} 
+            cancel={this.props.onCancelClick} />
+            );
       })}
       </div>);
   }

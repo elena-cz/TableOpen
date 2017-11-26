@@ -14,7 +14,7 @@ class App extends React.Component {
       times: [],
       partySizes: [],
       categories: [],
-      myReservations: [{ id: 1}, { id: 2}, { id: 3}, { id: 4}, { id: 5}],
+      myReservations: [],
       time: 'All',
       party: 'All',
       category: 'All',
@@ -108,8 +108,17 @@ class App extends React.Component {
 
   onAcceptClick(id, time, party, restaurant) {
     // send data to db and repopulate my reservation list
-    console.log(id, time, party, restaurant);
+    const myReservations = this.state.myReservations.slice(0);
+    myReservations.push({
+      id: id,
+      time: time,
+      party: party,
+      restaurant: restaurant
+    });
 
+    this.setState({
+      myReservations: myReservations
+    });
     // update reservation with a phone number
     // add reservation to myReservations
     // re-query db for all available reservations
@@ -118,8 +127,11 @@ class App extends React.Component {
 
   onCancelClick(index, id) {
     // send data to bd and repopulate my reservation list
-    console.log(index, id);
-
+    const myReservations = this.state.myReservations.slice(0);
+    myReservations.splice(index, 1);
+    this.setState({
+      myReservations: myReservations
+    });
     // update reservation and remove phonenumber on it
     // remove reservation from myReservations
     // re-query db for all available reservations
