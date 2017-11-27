@@ -9,7 +9,8 @@ const Search = props =>
     <div>
       <PhoneNumber onPhoneNumberSubmitClick={props.onPhoneNumberSubmitClick} />
       <br />
-      <Restaurant onCitySubmitClick={props.onCitySubmitClick} />
+      <Restaurant onCitySubmitClick={props.onCitySubmitClick} 
+        onRestaurantSubmitClick={props.onRestaurantSubmitClick}/>
       <br />
       <FilterMenu
         times={props.times}

@@ -40,7 +40,9 @@ class Restaurant extends React.Component {
             name="restaurant"
             onChange={this.onStateChange}
           />
-          <button>Search</button>
+          <button onClick={() => {
+            this.props.onRestaurantSubmitClick(this.state.restaurant);
+          }}>Search</button>
         </div>
       </div>);
   }

@@ -18,12 +18,14 @@ class App extends React.Component {
       time: 'All',
       party: 'All',
       category: 'All',
+      restaurant: ''
     };
     this.onAcceptClick = this.onAcceptClick.bind(this);
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
     this.onPhoneNumberSubmitClick = this.onPhoneNumberSubmitClick.bind(this);
     this.onCitySubmitClick = this.onCitySubmitClick.bind(this);
     this.onCancelClick = this.onCancelClick.bind(this);
+    this.onRestaurantSubmitClick = this.onRestaurantSubmitClick.bind(this);
   }
 
   componentWillMount() {
@@ -94,6 +96,12 @@ class App extends React.Component {
     // use api to retrieve new data for the city or restaurant
   }
 
+  onRestaurantSubmitClick(restaurant) {
+    this.setState({
+      restaurant
+    });
+  }
+
   onFilterSubmitClick(time, party, category) {
     // filter avaiable restaurants
     this.setState({
@@ -142,7 +150,6 @@ class App extends React.Component {
       });
     // update reservation with a phone number
     // add reservation to myReservations
-    // re-query db for all available reservations
   }
 
   onCancelClick(index, reservation) {
@@ -190,20 +197,17 @@ class App extends React.Component {
       times: this.state.time,
       partySizes: this.state.party === 'All' ? 'All' : Number(this.state.party),
       categories: this.state.category,
+      name: this.state.restaurant
     };
 
     let filteredData = this.state.data.slice(0);
-    // console.log('FILTERED DATA BEFORE ', filteredData);
 
     _.forEach(filters, (filter, key) => {
-      // console.log(filter);
-      if (filter !== 'All') {
+      if (filter !== 'All' && filter !== '') {
         filteredData = _.filter(filteredData, restaurant =>
           restaurant[key].includes(filter));
       }
     });
-
-    // console.log('filtered Data after', filteredData);
     return filteredData;
   }
 
@@ -217,6 +221,7 @@ class App extends React.Component {
           onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
           onCitySubmitClick={this.onCitySubmitClick}
           onFilterSubmitClick={this.onFilterSubmitClick}
+          onRestaurantSubmitClick={this.onRestaurantSubmitClick}
         />
         <div className="main">
           <AvailableReservations
