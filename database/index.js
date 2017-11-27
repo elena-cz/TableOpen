@@ -23,7 +23,7 @@ client.query(`
   url VARCHAR(255),
   image VARCHAR(255),
   phone VARCHAR(255),
-  reviewCount INT,
+  review_count INT,
   rating DECIMAL)`);
 
 // create schema for reservations
