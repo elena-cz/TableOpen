@@ -25,6 +25,7 @@ class Restaurant extends React.Component {
         <input
           type="text"
           name="city"
+          placeholder="San Francisco"
           onChange={this.onStateChange}
         />
         <button onClick={() =>

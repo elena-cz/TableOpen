@@ -15,6 +15,7 @@ class App extends React.Component {
       partySizes: [],
       categories: [],
       myReservations: [],
+      phoneNumber: '',
       time: 'All',
       party: 'All',
       category: 'All',
@@ -26,6 +27,7 @@ class App extends React.Component {
     this.onCitySubmitClick = this.onCitySubmitClick.bind(this);
     this.onCancelClick = this.onCancelClick.bind(this);
     this.onRestaurantSubmitClick = this.onRestaurantSubmitClick.bind(this);
+    this.onStateChange = this.onStateChange.bind(this);
   }
 
   componentWillMount() {
@@ -71,12 +73,22 @@ class App extends React.Component {
 
   onStateChange(e) {
     this.setState({ [e.target.name]: e.target.value }, () => {
-      console.log(this.state);
+      // console.log(this.state);
     });
   }
 
   onPhoneNumberSubmitClick(phoneNumber) {
     console.log(phoneNumber);
+    const self = this;
+    axios.get('/user', { phoneNumber })
+      .then((res) => {
+        self.setState({
+          myReservations: res.data
+        });
+      })
+      .catch((err) => {
+        throw err;
+      });
     // query db for reservations with this phone number
   }
 
@@ -142,7 +154,7 @@ class App extends React.Component {
 
     axios.post('/book', {
       reservationId: reservation.id,
-      phoneNumber: '555-867-5309',
+      phoneNumber: this.state.phoneNumber,
     })
       .then(() => console.log('we successfully booked a place!'))
       .catch((err) => {
@@ -215,6 +227,7 @@ class App extends React.Component {
     return (
       <div>
         <Search
+          phoneNumber={this.state.phoneNumber}
           times={this.state.times}
           partySizes={this.state.partySizes}
           categories={this.state.categories}
@@ -222,6 +235,7 @@ class App extends React.Component {
           onCitySubmitClick={this.onCitySubmitClick}
           onFilterSubmitClick={this.onFilterSubmitClick}
           onRestaurantSubmitClick={this.onRestaurantSubmitClick}
+          onStateChange={this.onStateChange}
         />
         <div className="main">
           <AvailableReservations
