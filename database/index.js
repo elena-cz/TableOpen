@@ -38,6 +38,13 @@ client.query(`CREATE TABLE IF NOT EXISTS reservations (
   isReservationBooked BOOLEAN DEFAULT FALSE
 )`);
 
+// create schema for customers
+client.query('DROP TABLE customers');
+client.query(`CREATE TABLE IF NOT EXISTS customers (
+  id SERIAL PRIMARY KEY,
+  phone VARCHAR(255)
+)`);
+
 const fakeReservationGenerator = (restaurantId) => {
   const reservations = [];
 

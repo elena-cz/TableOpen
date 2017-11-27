@@ -4,10 +4,12 @@ const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
 const { seedNewCity } = require('../database/index.js');
 
 const seedDatabase = (location = 'San Francisco, CA') => {
-  // storage array for all of the yelp restaurant data for a particular city
+  // storage array for all of the Yelp restaurant data for a particular city
   let cityData = [];
+  // an array of all the async Yelp queries we'll need to run
+  const yelpQueries = [];
 
-  // gather one page of restaurants from yelp and store in cityData array
+  // gather one page of restaurants from Yelp and store in cityData array
   const getOnePageOfRestaurants = (city, pageNumber) => new Promise((resolve, reject) => {
     getRestaurantsByCity(city, pageNumber)
       .then((partialResults) => {
@@ -17,21 +19,16 @@ const seedDatabase = (location = 'San Francisco, CA') => {
       .catch(err => reject(err));
   });
 
-  const SEED = () => {
-    // an array of all the async yelp queries we'll need to run
-    const yelpQueries = [];
-    // each page has 50 results; this will pull 1000 restaurants for a given city
-    for (let page = 3; page < 5; page += 1) {
-      yelpQueries.push(getOnePageOfRestaurants(location, page));
-    }
-    Promise.all(yelpQueries)
-      .then(() => {
-        seedNewCity(cityData);
-        console.log(`Number of restaurants in DB for San Francisco: ', ${cityData.length}`);
-      });
-  };
+  // each page from Yelp has 50 restaurants; this will pull 1000 restaurants for a given city
+  for (let page = 1; page < 3; page += 1) {
+    yelpQueries.push(getOnePageOfRestaurants(location, page));
+  }
 
-  SEED();
+  Promise.all(yelpQueries)
+    .then(() => {
+      seedNewCity(cityData);
+      console.log(`Number of restaurants in DB for San Francisco: ', ${cityData.length}`);
+    });
 };
 
 
