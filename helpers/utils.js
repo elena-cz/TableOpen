@@ -136,7 +136,7 @@ const formatCityResults = (cityResults) => {
 
 
 
-const queryCity = (city = 'San Francisco, CA') => {
+const queryDatabaseForCity = (city = 'San Francisco, CA') => {
   return new Promise((resolve, reject) => {
     const temp = city.split(',');
     const City = temp[0];
