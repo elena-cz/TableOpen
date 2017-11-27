@@ -99,11 +99,12 @@ class App extends React.Component {
     // query db for reservations with this phone number
   }
 
-  onCitySubmitClick(restaurant, city) {
-    console.log(restaurant, city);
+  onCitySubmitClick(city) {
+    console.log(city);
     const self = this;
     axios.post('/city', { city })
       .then((res) => {
+        console.log(res.data);
         self.setState({
           data: res.data
         });

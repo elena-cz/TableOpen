@@ -135,12 +135,18 @@ const formatCityResults = (cityResults) => {
 };
 
 
-const queryDatabaseForCity = (city = 'San Francisco') => {
+
+const queryCity = (city = 'San Francisco, CA') => {
   return new Promise((resolve, reject) => {
+    const temp = city.split(',');
+    const City = temp[0];
+    const State = temp[1].slice(1);
+
+    console.log(City, State);
     Promise.resolve(client.query(
       `SELECT restaurants.name, restaurants.category, restaurants.image, reservations.id, reservations.time, reservations.party_size 
       FROM reservations, restaurants 
-      WHERE (reservations.restaurant_id = restaurants.id AND restaurants.city = $1 AND reservations.isReservationBooked = FALSE)`, [city]))
+      WHERE (reservations.restaurant_id = restaurants.id AND restaurants.city = $1 AND restaurants.state = $2 AND reservations.isReservationBooked = FALSE)`, [City, State]))
       .then((results) => {
         resolve(results);
       })

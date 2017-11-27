@@ -25,7 +25,7 @@ const visitedCities = ['San Francisco, CA'];
 
 // App will initially load with SF as the default city
 app.get('/data', (request, response) => {
-  queryDatabaseForCity('San Francisco')
+  queryDatabaseForCity()
     .then(cityResults => response.send(formatCityResults(cityResults)))
     .catch((err) => {
       throw err;

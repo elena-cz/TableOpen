@@ -5,9 +5,9 @@
 ## Team
 
   - Bernard Kitchens
+  - Chadam Miller
   - Nick Gratzick
   - Vlad Tretyakov
-  - Chadam Miller
 
 
 ## Table of Contents
@@ -22,15 +22,15 @@
 
 ## Usage
 
-> Some usage instructions
+> A customer will input their phone number, input their city, and accept the desired reservation. This reservation will then appear in the My Rservations list
 
 ## Requirements
 
-- Node 6.4.x
-- Redis 2.6.x
-- Postgresql 9.1.x
-- etc
-- etc
+- Node 8.6.x
+- React
+- Postgresql 10
+- Jasmine
+- Yelp, Twilio
 
 ## Development
 
@@ -38,10 +38,11 @@
 
 From within the root directory:
 
+Requires Postgres 10;
+Create a Postgres database with UTF-8 encoding on your machine.
+
 ```sh
-npm install -g bower
 npm install
-bower install
 ```
 
 ### Roadmap

@@ -29,7 +29,7 @@ class Restaurant extends React.Component {
           onChange={this.onStateChange}
         />
         <button onClick={() =>
-          this.props.onCitySubmitClick(this.state.restaurant, this.state.city)}
+          this.props.onCitySubmitClick(this.state.city)}
         >
           Submit
         </button>
