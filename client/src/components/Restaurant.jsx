@@ -39,6 +39,7 @@ class Restaurant extends React.Component {
           <input
             type="text"
             name="restaurant"
+            placeholder="Search for restaurant by name"
             onChange={this.onStateChange}
           />
           <button onClick={() => {
@@ -53,4 +54,5 @@ export default Restaurant;
 
 Restaurant.propTypes = {
   onCitySubmitClick: PropTypes.func.isRequired,
+  onRestaurantSubmitClick: PropTypes.func.isRequired,
 };

@@ -13,8 +13,10 @@ const Search = props =>
         onStateChange={props.onStateChange}
       />
       <br />
-      <Restaurant onCitySubmitClick={props.onCitySubmitClick} 
-        onRestaurantSubmitClick={props.onRestaurantSubmitClick}/>
+      <Restaurant
+        onCitySubmitClick={props.onCitySubmitClick}
+        onRestaurantSubmitClick={props.onRestaurantSubmitClick}
+      />
       <br />
       <FilterMenu
         times={props.times}
@@ -37,4 +39,5 @@ Search.propTypes = {
   onCitySubmitClick: PropTypes.func.isRequired,
   onFilterSubmitClick: PropTypes.func.isRequired,
   onStateChange: PropTypes.func.isRequired,
+  onRestaurantSubmitClick: PropTypes.func.isRequired,
 };

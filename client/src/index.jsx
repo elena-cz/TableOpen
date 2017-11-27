@@ -16,10 +16,10 @@ class App extends React.Component {
       categories: [],
       myReservations: [],
       phoneNumber: '',
+      restaurant: '',
       time: 'All',
       party: 'All',
       category: 'All',
-      restaurant: ''
     };
     this.onAcceptClick = this.onAcceptClick.bind(this);
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
@@ -38,8 +38,7 @@ class App extends React.Component {
         let partySizeData = {};
         let categoryData = {};
 
-        // Funnels all data into a coresponding object to remove duplicates
-        // found
+        // Funnels all data into a corresponding object to remove duplicates
         _.forEach(res.data, (restaurant) => {
           _.forEach(restaurant.times, (time) => {
             timeData[time] = time;
@@ -54,11 +53,21 @@ class App extends React.Component {
           });
         });
 
-        timeData = ['All'].concat(Object.keys(timeData));
-        partySizeData = ['All'].concat(Object.keys(partySizeData));
-        categoryData = ['All'].concat(Object.keys(categoryData));
+        timeData = ['All'].concat(Object.keys(timeData).sort((a, b) => {
+          // Change two strings of times into numbers so we can easily compare them
+          // Ex: a = '5:00 PM' -> time1 = 500
+          //     b = '6:30 PM' -> time2 = 630
+          let time1 = a.split(' PM').join('').split(':');
+          time1 = (time1[0] * 100) + time1[1];
 
-        // Sets state to
+          let time2 = b.split(' PM').join('').split(':');
+          time2 = (time2[0] * 100) + time2[1];
+
+          return parseInt(time1, 10) - parseInt(time2, 10);
+        }));
+        partySizeData = ['All'].concat(Object.keys(partySizeData).sort());
+        categoryData = ['All'].concat(Object.keys(categoryData).sort());
+
         self.setState({
           data: res.data,
           times: timeData,
@@ -72,9 +81,7 @@ class App extends React.Component {
 
 
   onStateChange(e) {
-    this.setState({ [e.target.name]: e.target.value }, () => {
-      // console.log(this.state);
-    });
+    this.setState({ [e.target.name]: e.target.value });
   }
 
   onPhoneNumberSubmitClick(phoneNumber) {
@@ -95,7 +102,7 @@ class App extends React.Component {
   onCitySubmitClick(restaurant, city) {
     console.log(restaurant, city);
     const self = this;
-    axios.post('data/city', { city })
+    axios.post('/city', { city })
       .then((res) => {
         self.setState({
           data: res.data
@@ -121,8 +128,6 @@ class App extends React.Component {
       party,
       category,
     });
-
-    // console.log(time, party, category);
   }
 
 
@@ -133,7 +138,7 @@ class App extends React.Component {
       id: reservation.id,
       time: reservation.time,
       party: reservation.people,
-      restaurant: restaurant
+      restaurant: restaurant,
     });
 
     const restaurants = this.state.data.slice(0);
@@ -192,24 +197,18 @@ class App extends React.Component {
       .catch((err) => {
         throw err;
       });
-    // update reservation and remove phonenumber on it
-    // remove reservation from myReservations
-    // re-query db for all available reservations
   }
 
   filterData() {
-    // console.log(this.state.data);
 
-    // Object used to simplify the filtering process
-    // Keys are properties located on each restaurant object
-    // recieved from server
-    // Values are the search by terms provided by the user
+    // This function creates the datapoints that populate the various dropdown filters
+    // Depends on the dataset coming from server
 
     const filters = {
       times: this.state.time,
       partySizes: this.state.party === 'All' ? 'All' : Number(this.state.party),
       categories: this.state.category,
-      name: this.state.restaurant
+      name: this.state.restaurant,
     };
 
     let filteredData = this.state.data.slice(0);
@@ -244,8 +243,10 @@ class App extends React.Component {
             time={this.state.time}
             party={this.state.party}
           />
-          <Myreservations reservations={this.state.myReservations}
-            onCancelClick={this.onCancelClick} />
+          <Myreservations
+            reservations={this.state.myReservations}
+            onCancelClick={this.onCancelClick} 
+          />
         </div>
       </div>
     );

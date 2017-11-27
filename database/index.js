@@ -11,7 +11,8 @@ client.connect();
 
 // create schema for restaurants
 client.query('DROP TABLE restaurants');
-client.query(`CREATE TABLE IF NOT EXISTS restaurants (
+client.query(`
+  CREATE TABLE IF NOT EXISTS restaurants (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255),
   category VARCHAR(255),
@@ -23,26 +24,25 @@ client.query(`CREATE TABLE IF NOT EXISTS restaurants (
   image VARCHAR(255),
   phone VARCHAR(255),
   reviewCount INT,
-  rating DECIMAL
-)`);
+  rating DECIMAL)`);
 
 // create schema for reservations
 client.query('DROP TABLE reservations');
-client.query(`CREATE TABLE IF NOT EXISTS reservations (
+client.query(`
+  CREATE TABLE IF NOT EXISTS reservations (
   id SERIAL PRIMARY KEY,
   restaurant_id INT,
   time VARCHAR(255),
   party_size INT,
   customer_id INT DEFAULT NULL,
-  isReservationBooked BOOLEAN DEFAULT FALSE
-)`);
+  isReservationBooked BOOLEAN DEFAULT FALSE)`);
 
 // create schema for customers
 client.query('DROP TABLE customers');
-client.query(`CREATE TABLE IF NOT EXISTS customers (
+client.query(`
+  CREATE TABLE IF NOT EXISTS customers (
   id SERIAL PRIMARY KEY,
-  phone VARCHAR(255)
-)`);
+  phone VARCHAR(255))`);
 
 module.exports = {
   client,
