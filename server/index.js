@@ -65,7 +65,7 @@ app.put('/cancel', (request, response) => {
     .then(results => response.send(results.rows));
 });
 
-app.get('/user', (request, response) => {
+app.post('/user', (request, response) => {
   getCustomerReservations(request.body.phoneNumber)
     .then(results => response.send(results.rows));
 });

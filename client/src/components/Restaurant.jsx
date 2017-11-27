@@ -13,9 +13,7 @@ class Restaurant extends React.Component {
   }
 
   onStateChange(e) {
-    this.setState({ [e.target.name]: e.target.value }, () => {
-    // console.log(this.state);
-    });
+    this.setState({ [e.target.name]: e.target.value });
   }
 
   render() {
@@ -44,7 +42,10 @@ class Restaurant extends React.Component {
           />
           <button onClick={() => {
             this.props.onRestaurantSubmitClick(this.state.restaurant);
-          }}>Search</button>
+          }}
+          >
+            Search
+          </button>
         </div>
       </div>);
   }

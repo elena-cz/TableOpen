@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import ReservationList from './ReservationList.jsx';
 import RestaurantEntry from './RestaurantEntry.jsx';
 
 const AvailableReservations = props =>

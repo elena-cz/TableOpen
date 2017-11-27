@@ -89,7 +89,6 @@ const seedDatabase = (location = 'San Francisco, CA') => {
   Promise.all(yelpQueries)
     .then(() => {
       saveNewCityData(cityData);
-      console.log(`Number of restaurants in DB for San Francisco: ', ${cityData.length}`);
     });
 };
 
@@ -155,27 +154,10 @@ const queryDatabaseForCity = (city = 'San Francisco, CA') => {
 };
 
 
-const createNewCustomer = (phoneNumber = '555-867-5309') => {
-  return new Promise((resolve, reject) => {
-    Promise.resolve(client.query(
-      `INSERT 
-      INTO customers 
-      VALUES (DEFAULT, $1) RETURNING id`,
-      [phoneNumber]))
-      .then((results) => {
-        resolve(results);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
-
 const getCustomerReservations = (phoneNumber = '555-867-5309') => {
   return new Promise((resolve, reject) => {
     Promise.resolve(client.query(
-      `SELECT restaurants.name, restaurants.category, reservations.id, reservations.time, reservations.party_size, customers.phone 
+      `SELECT restaurants.name, reservations.id, reservations.time, reservations.party_size, customers.phone 
       FROM reservations, restaurants, customers 
       WHERE (
       reservations.restaurant_id = restaurants.id AND 
@@ -215,7 +197,7 @@ const bookReservation = (reservationId, phoneNumber = '555-867-5309') => {
             })
             .catch(err => reject(err));
         } else {
-          // This user is new; we gotta add them to the customers table in the DB
+          // This user is new; we need to add them to the customers table in the DB
           // Then, we'll use their newly assigned ID to finish assigning this reservation to them
           Promise.resolve(client.query(
             `INSERT 

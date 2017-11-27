@@ -14,6 +14,8 @@ const ReservationEntry = props =>
 export default ReservationEntry;
 
 ReservationEntry.propTypes = {
+  accept: PropTypes.func.isRequired,
+  restaurant: PropTypes.string.isRequired,
   reservation: PropTypes.shape({
     time: PropTypes.string,
     people: PropTypes.number,
