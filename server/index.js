@@ -1,16 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
-// const twilio = require('../helpers/twilioApi.js');
-// const _ = require('underscore');
 const path = require('path');
-// const moment = require('moment');
-const { seedNewCity, queryCity } = require('../database/index.js');
-const { seedDatabase, formatCityResults } = require('../helpers/utils.js');
+// const twilio = require('../helpers/twilioApi.js');
+const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
+// const { seedNewCity, queryCity } = require('../database/index.js');
+const { seedDatabase,
+        formatCityResults,
+        getCustomerReservations,
+        seedNewCity,
+        queryCity,
+        bookReservation,
+        cancelReservation } = require('../helpers/utils.js');
 
 const PORT = 3000;
 const app = express();
-let visitedCities = ['San Francisco, CA'];
+const visitedCities = ['San Francisco, CA'];
 
 app.use(express.static(path.join(__dirname, '/../client/dist')));
 app.use(bodyParser.json());
@@ -21,23 +25,12 @@ seedDatabase();
 
 app.get('/data', (request, response) => {
   // GETS SF DATA AS INITIAL SEED
-  getRestaurantsByCity()
-    .then((results) => {
-      seedNewCity(results.data.businesses)
-        .then(() => {
-          queryCity()
-            .then((cityResults) => {
-              const data = formatCityResults(cityResults);
-              response.send(data);
-            })
-            .catch((err) => {
-              throw err;
-            });
-        })
-        .catch((err) => {
-          throw err;
-        });
-    }).catch((err) => {
+  queryCity('San Francisco')
+    .then((cityResults) => {
+      const data = formatCityResults(cityResults);
+      response.send(data);
+    })
+    .catch((err) => {
       throw err;
     });
 });
@@ -79,40 +72,23 @@ app.post('/data/city', (request, response) => {
   }
 });
 
-app.post('/book', (req, res) => {
-  // Route for booking a reservation
-
-  // req.body should contain a reservation id, and phone number
-
-  // add phone number to reservation and update DB in three spots:
-  // 1) create the customer in the customers table if they don't already exist
-  // 2A) update reservation in reservations table to show as booked
-  // 2B) while also assigning the customer id appropriately
-
-  res.send();
+app.post('/book', (request, response) => {
+  bookReservation(request.body.reservationId, request.body.phoneNumber)
+    .then(results => {
+      response.send(results);
+    });
 });
 
-app.put('/cancel', (req, res) => {
-  // Route for canceling a reservation (updating records)
-
-  // req.body should contain a reservation id
-
-  // remove phone number from reservation
-
-  res.send();
+app.put('/cancel', (request, response) => {
+  cancelReservation(request.body.reservationId)
+    .then(results => {
+      response.send(results.rows);
+    });
 });
 
-
-app.get('/phone', (req, res) => {
-  // Route for getting reservations for phone number
-
-  // req.body sould contain phone number
-
-  // query db for all reservations linked to PN
-
-  // send back array of reservaitons
-
-  res.send();
+app.get('/user', (request, response) => {
+  getCustomerReservations(request.body.phoneNumber)
+    .then(results => response.send(results.rows));
 });
 
 app.listen(PORT, () => { console.log(`Server listening on port ${PORT}`); });

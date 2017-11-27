@@ -81,7 +81,7 @@ class App extends React.Component {
   onCitySubmitClick(restaurant, city) {
     console.log(restaurant, city);
     const self = this;
-    axios.post('data/city', { city: city })
+    axios.post('data/city', { city })
       .then((res) => {
         self.setState({
           data: res.data
@@ -128,9 +128,18 @@ class App extends React.Component {
     });
 
     this.setState({
-      myReservations: myReservations,
+      myReservations,
       data: restaurants
     });
+
+    axios.post('/book', {
+      reservationId: reservation.id,
+      phoneNumber: '555-867-5309',
+    })
+      .then(() => console.log('we successfully booked a place!'))
+      .catch((err) => {
+        throw err;
+      });
     // update reservation with a phone number
     // add reservation to myReservations
     // re-query db for all available reservations
@@ -153,9 +162,17 @@ class App extends React.Component {
     });
 
     this.setState({
-      myReservations: myReservations,
+      myReservations,
       data: restaurants
     });
+
+    axios.put('/cancel', {
+      reservationId: reservation.id,
+    })
+      .then(() => console.log('we successfully cancelled a reservation!'))
+      .catch((err) => {
+        throw err;
+      });
     // update reservation and remove phonenumber on it
     // remove reservation from myReservations
     // re-query db for all available reservations
