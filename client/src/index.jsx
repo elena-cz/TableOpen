@@ -81,7 +81,7 @@ class App extends React.Component {
   onCitySubmitClick(restaurant, city) {
     console.log(restaurant, city);
     const self = this;
-    axios.post('data/city', {city: city})
+    axios.post('data/city', { city: city })
       .then((res) => {
         self.setState({
           data: res.data
@@ -106,36 +106,59 @@ class App extends React.Component {
   }
 
 
-  onAcceptClick(id, time, party, restaurant) {
+  onAcceptClick(reservation, restaurant) {
     // send data to db and repopulate my reservation list
     const myReservations = this.state.myReservations.slice(0);
     myReservations.push({
-      id: id,
-      time: time,
-      party: party,
+      id: reservation.id,
+      time: reservation.time,
+      party: reservation.people,
       restaurant: restaurant
     });
 
+    const restaurants = this.state.data.slice(0);
+    _.forEach(restaurants, (rest) => {
+      if (rest.name === restaurant) {
+        _.forEach(rest.reservations, (res) => {
+          if (res.id === reservation.id) {
+            res.booked = true;
+          }
+        });
+      }
+    });
+
     this.setState({
-      myReservations: myReservations
+      myReservations: myReservations,
+      data: restaurants
     });
     // update reservation with a phone number
     // add reservation to myReservations
     // re-query db for all available reservations
-
   }
 
-  onCancelClick(index, id) {
+  onCancelClick(index, reservation) {
     // send data to bd and repopulate my reservation list
     const myReservations = this.state.myReservations.slice(0);
     myReservations.splice(index, 1);
+
+    const restaurants = this.state.data.slice(0);
+    _.forEach(restaurants, (rest) => {
+      if (rest.name === reservation.restaurant) {
+        _.forEach(rest.reservations, (res) => {
+          if (res.id === reservation.id) {
+            res.booked = false;
+          }
+        });
+      }
+    });
+
     this.setState({
-      myReservations: myReservations
+      myReservations: myReservations,
+      data: restaurants
     });
     // update reservation and remove phonenumber on it
     // remove reservation from myReservations
     // re-query db for all available reservations
-
   }
 
   filterData() {

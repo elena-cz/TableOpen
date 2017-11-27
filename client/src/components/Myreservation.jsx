@@ -13,7 +13,7 @@ class Myreservation extends React.Component {
           <li>Restaurant: {this.props.reservation.restaurant}</li>
           <li>Time: {moment(this.props.reservation.time).format('LT')}</li>
           <li>Party: {this.props.reservation.party}</li>
-          <li><button onClick={() => { this.props.cancel(this.props.index, this.props.reservation.id) }} >Cancel</button></li>
+          <li><button onClick={() => { this.props.cancel(this.props.index, this.props.reservation) }} >Cancel</button></li>
         </ul>
       </div>);
   }

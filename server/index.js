@@ -45,15 +45,14 @@ app.get('/data', (request, response) => {
 app.post('/data/city', (request, response) => {
   // Route for getting restaurants for particular city
   // Check visited cities array to see if we have already found it
-  if (visitedCities.indexOf(request.body.city) < 0) {
+  if (!visitedCities.includes(request.body.city)) {
+    visitedCities.push(request.body.city);
     getRestaurantsByCity(request.body.city)
       .then((results) => {
-        // console.log('DATA FOR ', request.body.city);
         seedNewCity(results.data.businesses)
           .then(() => {
-            queryCity()
+            queryCity(request.body.city)
               .then((cityResults) => {
-                // console.log('DENVER ', cityResults);
                 const data = formatCityResults(cityResults);
                 response.send(data);
               })
@@ -69,10 +68,14 @@ app.post('/data/city', (request, response) => {
         throw err;
       });
   } else {
-    const data = sampleData.massagedDataYelp.businesses;
-    // retrieve from db
-    // send to client
-    response.send();
+    queryCity(request.body.city)
+      .then((cityResults) => {
+        const data = formatCityResults(cityResults);
+        response.send(data);
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 });
 
@@ -113,31 +116,3 @@ app.get('/phone', (req, res) => {
 });
 
 app.listen(PORT, () => { console.log(`Server listening on port ${PORT}`); });
-
-
-
-
-
-
-
-
-// const reservations = [{
-//   time: '2017-11-20T19:30:00Z',
-//   people: 7
-// }, {
-//   time: '2017-11-20T20:00:00Z',
-//   people: 3
-// }
-// ];
-
-// const data = _.map(results.data.businesses, (res) => {
-//   const output = {
-//     name: res.name,
-//     image_url: res.image_url,
-//     reservations: reservations,
-//     partySizes: reservations.map((slot) => {return slot.people}),
-//     times: reservations.map((slot) => {return moment(slot.time).format('LT')}),
-//     categories: res.categories.map((slot) => {return slot.title})
-//   };
-//   return output;
-// });

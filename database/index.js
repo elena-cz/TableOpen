@@ -100,10 +100,12 @@ const seedNewCity = (data) => {
   return Promise.all(restaurants);
 };
 
-const queryCity = () => {
+const queryCity = (city = 'San Francisco') => {
   return new Promise((resolve, reject) => {
     Promise.resolve(client.query(`
-      SELECT restaurants.name, restaurants.category, restaurants.image, reservations.id, reservations.time, reservations.party_size FROM reservations, restaurants WHERE reservations.restaurant_id = restaurants.id`))
+      SELECT restaurants.name, restaurants.category, restaurants.image, reservations.id, reservations.time, reservations.party_size 
+      FROM reservations, restaurants 
+      WHERE reservations.restaurant_id = restaurants.id AND restaurants.city = $1 AND reservations.isReservationBooked = FALSE`, [city]))
       .then((results) => {
         resolve(results);
       })

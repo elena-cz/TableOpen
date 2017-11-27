@@ -44,6 +44,7 @@ const formatCityResults = (cityResults) => {
         time: JSON.parse(rest.time),
         people: rest.party_size,
         id: rest.id,
+        booked: rest.isReservationBooked,
       });
     } else {
       // create restaurant key in the restaurants object
@@ -57,6 +58,7 @@ const formatCityResults = (cityResults) => {
         time: JSON.parse(rest.time),
         people: rest.party_size,
         id: rest.id,
+        booked: rest.isReservationBooked,
       });
     }
   });
