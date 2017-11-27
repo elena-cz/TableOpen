@@ -1,56 +1,34 @@
-const axios = require('axios');
-const { TWILIO_AUTH_TOKEN, TWILIO_DEFAULT_PHONE_NUMBER } = require('./config.js');
-// const config = require('./config.js');
-// const Promise = require('bluebird');
+const moment = require('moment');
+const {
+  TWILIO_AUTH_TOKEN,
+  TWILIO_DEFAULT_VOIP_PHONE_NUMBER,
+  TWILIO_DEFAULT_CUSTOMER_NUMBER,
+  TWILIO_ACCOUNT_SID,
+} = require('./config.js');
+const client = require('twilio')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
-const accountSid ='Account Number would go here';
-const authToken = 'Would be taken from config';
-
-// const client = require('twilio')(accountSid, authToken);
-// const client = require('twilio')(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN);
-
-
-//Request format: https://{AccountSid}:{AuthToken}@api.twilio.com/2010-04-01/Accounts
-//Helper functions to export
-
-//LEFT HERE FOR REFERENCE
-// let sendAcceptMsg = ()=>{
-//     //Returns a promise
-//     return  client.messages
-//             .create({
-//             to: '+TargetNumber(Would be one of ours)',
-//             from: '+Twilio Number tied to the account',
-//             body: 'Your reservation at RESTAURANT NAME at TIME is booked',
-//             })
-// }
-
-// let sendCancelMsg = ()=>{
-//     //Returns a promise
-//     return  client.messages
-//             .create({
-//             to: '+TargetNumber(Would be one of ours)',
-//             from: '+Twilio Number tied to the account',
-//             body: 'Your reservation at RESTAURANT NAME at TIME is cancelled',
-//             })
-// }
-
-const sendAcceptMsg = phoneNumber =>
-  client.messages
+const sendConfirmationText = (reservation, phoneNumber = TWILIO_DEFAULT_CUSTOMER_NUMBER) => {
+  const displayTime = reservation.time.split('\"').join('');
+  return client.messages
     .create({
       to: phoneNumber,
-      from: TWILIO_DEFAULT_PHONE_NUMBER,
-      body: 'Your reservation at RESTAURANT NAME at TIME is booked',
+      from: TWILIO_DEFAULT_VOIP_PHONE_NUMBER,
+      body: `Your reservation at ${reservation.restaurant_id} for ${reservation.party_size} people starting at ${moment(displayTime).format('LT')} has been confirmed!`,
     });
+};
 
-const sendCancelMsg = phoneNumber =>
-  client.messages
+const sendCancellationText = (reservation, phoneNumber = TWILIO_DEFAULT_CUSTOMER_NUMBER) => {
+  const displayTime = reservation.time.split('\"').join('');
+  return client.messages
     .create({
       to: phoneNumber,
-      from: TWILIO_DEFAULT_PHONE_NUMBER,
-      body: 'Your reservation at RESTAURANT NAME at TIME is cancelled',
+      from: TWILIO_DEFAULT_VOIP_PHONE_NUMBER,
+      body: `Your reservation at ${reservation.restaurant_id} for ${reservation.party_size} people starting at ${moment(displayTime).format('LT')} has been cancelled.`,
     });
+};
+
 
 module.exports = {
-  sendAcceptMsg,
-  sendCancelMsg,
+  sendConfirmationText,
+  sendCancellationText,
 };

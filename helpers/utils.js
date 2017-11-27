@@ -2,6 +2,7 @@ const _ = require('underscore');
 const moment = require('moment');
 const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
 const { client } = require('../database/index.js');
+const { sendConfirmationText, sendCancellationText } = require('../helpers/twilioApi.js');
 
 // Create 1-3 reservations for a given restaurant
 const generateFakeReservations = (restaurantId) => {
@@ -209,10 +210,11 @@ const bookReservation = (reservationId, phoneNumber = '555-867-5309') => {
                 `UPDATE reservations
                 SET isReservationBooked = TRUE, customer_id = $1
                 WHERE reservations.id = $2 
-                RETURNING reservations.id`,
+                RETURNING *`,
                 [customerId.rows[0].id, reservationId]
               ))
                 .then((bookingConfirmation) => {
+                  sendConfirmationText(bookingConfirmation.rows[0]);
                   resolve(bookingConfirmation);
                 })
                 .catch(err => reject(err));
@@ -231,9 +233,10 @@ const cancelReservation = (reservationId) => {
       `UPDATE reservations
       SET isReservationBooked = FALSE, customer_id = NULL
       WHERE reservations.id = $1
-      RETURNING reservations.id`,
+      RETURNING *`,
       [reservationId]))
       .then((cancellingConfirmation) => {
+        sendCancellationText(cancellingConfirmation.rows[0]);
         resolve(cancellingConfirmation);
       })
       .catch(err => reject(err));
