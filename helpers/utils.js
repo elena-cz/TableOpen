@@ -82,7 +82,7 @@ const seedDatabase = (location = 'San Francisco, CA') => {
   // an array of all the async Yelp queries we'll need to run
   const yelpQueries = [];
   // each page from Yelp has 50 restaurants; this will pull 1000 restaurants for a given city
-  for (let page = 1; page < 2; page += 1) {
+  for (let page = 1; page < 20; page += 1) {
     yelpQueries.push(getOnePageOfRestaurants(location, page));
   }
 
