@@ -1,5 +1,5 @@
-//Dependencies
 const axios = require('axios');
+const { TWILIO_AUTH_TOKEN, TWILIO_DEFAULT_PHONE_NUMBER } = require('./config.js');
 // const config = require('./config.js');
 // const Promise = require('bluebird');
 
@@ -34,26 +34,23 @@ const authToken = 'Would be taken from config';
 //             })
 // }
 
-// TWILIO NUMBER: +18312788033
-const sendAcceptMsg = ()=>{
-  return  client.messages
+const sendAcceptMsg = phoneNumber =>
+  client.messages
     .create({
-      to: '',
-      from: '+18312788033',
+      to: phoneNumber,
+      from: TWILIO_DEFAULT_PHONE_NUMBER,
       body: 'Your reservation at RESTAURANT NAME at TIME is booked',
     });
-};
 
-const sendCancelMsg = () => {
-  return  client.messages
+const sendCancelMsg = phoneNumber =>
+  client.messages
     .create({
-      to: '',
-      from: '+18312788033',
+      to: phoneNumber,
+      from: TWILIO_DEFAULT_PHONE_NUMBER,
       body: 'Your reservation at RESTAURANT NAME at TIME is cancelled',
     });
-};
 
 module.exports = {
-  sendAcceptMsg:sendAcceptMsg,
-  sendCancelMsg:sendCancelMsg
+  sendAcceptMsg,
+  sendCancelMsg,
 };

@@ -3,18 +3,16 @@ const bodyParser = require('body-parser');
 const path = require('path');
 // const twilio = require('../helpers/twilioApi.js');
 const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
-// const { seedNewCity, queryCity } = require('../database/index.js');
 const { seedDatabase,
         formatCityResults,
+        saveNewCityData,
+        queryDatabaseForCity,
         getCustomerReservations,
-        seedNewCity,
-        queryCity,
         bookReservation,
         cancelReservation } = require('../helpers/utils.js');
 
 const PORT = 3000;
 const app = express();
-const visitedCities = ['San Francisco, CA'];
 
 app.use(express.static(path.join(__dirname, '/../client/dist')));
 app.use(bodyParser.json());
@@ -23,49 +21,34 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // initialize the database with a yelp query for 1000 SF restaurants
 seedDatabase();
 
+const visitedCities = ['San Francisco, CA'];
+
+// App will initially load with SF as the default city
 app.get('/data', (request, response) => {
-  // GETS SF DATA AS INITIAL SEED
-  queryCity('San Francisco')
-    .then((cityResults) => {
-      const data = formatCityResults(cityResults);
-      response.send(data);
-    })
+  queryDatabaseForCity('San Francisco')
+    .then(cityResults => response.send(formatCityResults(cityResults)))
     .catch((err) => {
       throw err;
     });
 });
 
-app.post('/data/city', (request, response) => {
-  // Route for getting restaurants for particular city
-  // Check visited cities array to see if we have already found it
+// Get restaurants and reservations for a particular city
+app.post('/city', (request, response) => {
+  // Check whether we have previously queried Yelp for this city
   if (!visitedCities.includes(request.body.city)) {
+    // If this is a new city: query Yelp for data, store it in DB, send data to client
     visitedCities.push(request.body.city);
     getRestaurantsByCity(request.body.city)
-      .then((results) => {
-        seedNewCity(results.data.businesses)
-          .then(() => {
-            queryCity(request.body.city)
-              .then((cityResults) => {
-                const data = formatCityResults(cityResults);
-                response.send(data);
-              })
-              .catch((err) => {
-                throw err;
-              });
-          })
-          .catch((err) => {
-            throw err;
-          });
-      })
+      .then(yelpResults => saveNewCityData(yelpResults.data.businesses))
+      .then(() => queryDatabaseForCity(request.body.city))
+      .then(cityResults => response.send(formatCityResults(cityResults)))
       .catch((err) => {
         throw err;
       });
   } else {
-    queryCity(request.body.city)
-      .then((cityResults) => {
-        const data = formatCityResults(cityResults);
-        response.send(data);
-      })
+    // We'll skip the Yelp query if this city's data is already in the DB
+    queryDatabaseForCity(request.body.city)
+      .then(cityResults => response.send(formatCityResults(cityResults)))
       .catch((err) => {
         throw err;
       });
@@ -74,16 +57,12 @@ app.post('/data/city', (request, response) => {
 
 app.post('/book', (request, response) => {
   bookReservation(request.body.reservationId, request.body.phoneNumber)
-    .then(results => {
-      response.send(results);
-    });
+    .then(results => response.send(results.rows));
 });
 
 app.put('/cancel', (request, response) => {
   cancelReservation(request.body.reservationId)
-    .then(results => {
-      response.send(results.rows);
-    });
+    .then(results => response.send(results.rows));
 });
 
 app.get('/user', (request, response) => {
@@ -91,4 +70,4 @@ app.get('/user', (request, response) => {
     .then(results => response.send(results.rows));
 });
 
-app.listen(PORT, () => { console.log(`Server listening on port ${PORT}`); });
+app.listen(PORT, () => console.log(`The TableOpen server is listening on port ${PORT}!`));

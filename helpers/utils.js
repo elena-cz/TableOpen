@@ -3,10 +3,10 @@ const moment = require('moment');
 const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
 const { client } = require('../database/index.js');
 
+// Create 1-3 reservations for a given restaurant
 const generateFakeReservations = (restaurantId) => {
   const reservations = [];
 
-  // Create 1-3 fake and randomly timed/sized reservations
   const reservationCount = Math.ceil(Math.random() * 3);
   for (let i = 0; i < reservationCount; i += 1) {
     // 1) randomly generate the party size for this reservation
@@ -26,9 +26,9 @@ const generateFakeReservations = (restaurantId) => {
     // 2) randomly generate the start time for this reservation
     const reservationTimeCalculator = Math.ceil(Math.random() * 6) + Math.ceil(Math.random() * 6);
     /*
-    Reservations range from 5pm to 10pm, inclusive.
+    Reservation start times range from 5pm to 10pm, inclusive
     Weighting of odds for start times is similar to dice probabilties
-    7:30 is the most common start time, and 5pm/10pm are the least likely start times.
+    7:30 is the most common start time, and 5pm/10pm are the least likely start times
     */
     const reservationTime = moment().startOf('day').add(16 + (reservationTimeCalculator * 0.5), 'hours');
 
@@ -42,7 +42,7 @@ const generateFakeReservations = (restaurantId) => {
   return Promise.all(reservations);
 };
 
-const seedNewCity = (data) => {
+const saveNewCityData = (data) => {
   const restaurants = data.map((restaurant) => {
     return new Promise((resolve, reject) => {
       Promise.resolve(client.query(
@@ -82,13 +82,13 @@ const seedDatabase = (location = 'San Francisco, CA') => {
   // an array of all the async Yelp queries we'll need to run
   const yelpQueries = [];
   // each page from Yelp has 50 restaurants; this will pull 1000 restaurants for a given city
-  for (let page = 1; page < 20; page += 1) {
+  for (let page = 0; page < 20; page += 1) {
     yelpQueries.push(getOnePageOfRestaurants(location, page));
   }
 
   Promise.all(yelpQueries)
     .then(() => {
-      seedNewCity(cityData);
+      saveNewCityData(cityData);
       console.log(`Number of restaurants in DB for San Francisco: ', ${cityData.length}`);
     });
 };
@@ -135,7 +135,7 @@ const formatCityResults = (cityResults) => {
 };
 
 
-const queryCity = (city = 'San Francisco') => {
+const queryDatabaseForCity = (city = 'San Francisco') => {
   return new Promise((resolve, reject) => {
     Promise.resolve(client.query(
       `SELECT restaurants.name, restaurants.category, restaurants.image, reservations.id, reservations.time, reservations.party_size 
@@ -198,7 +198,7 @@ const bookReservation = (reservationId, phoneNumber = '555-867-5309') => {
     ))
       .then((results) => {
         if (results.rows.length) {
-          // user is an existing customer
+          // User is an existing customer
           Promise.resolve(client.query(
             `UPDATE reservations
             SET isReservationBooked = TRUE, customer_id = $1
@@ -211,13 +211,14 @@ const bookReservation = (reservationId, phoneNumber = '555-867-5309') => {
             })
             .catch(err => reject(err));
         } else {
+          // This user is new; we gotta add them to the customers table in the DB
+          // Then, we'll use their newly assigned ID to finish assigning this reservation to them
           Promise.resolve(client.query(
             `INSERT 
             INTO customers 
             VALUES (DEFAULT, $1) RETURNING id`,
             [phoneNumber]))
             .then((customerId) => {
-              // Promise.resolve('hello');
               Promise.resolve(client.query(
                 `UPDATE reservations
                 SET isReservationBooked = TRUE, customer_id = $1
@@ -257,9 +258,8 @@ const cancelReservation = (reservationId) => {
 module.exports = {
   seedDatabase,
   formatCityResults,
-  seedNewCity,
-  queryCity,
-  createNewCustomer,
+  saveNewCityData,
+  queryDatabaseForCity,
   getCustomerReservations,
   bookReservation,
   cancelReservation,

@@ -3,6 +3,10 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import ReservationEntry from './ReservationEntry.jsx';
 
+// Conditionally render an individual reservation only if it's:
+//   1) not already booked by a customer
+//   2) meets the criteria of the various filters for time/size/category
+
 const RestaurantEntry = props =>
   (
     <div>
@@ -14,9 +18,10 @@ const RestaurantEntry = props =>
           (moment(reservation.time).format('LT') === props.time || props.time === 'All')
           && (reservation.people.toString() === props.party || props.party === 'All')
           && (!reservation.booked)
-          && <ReservationEntry key={reservation.time} 
-            restaurant={props.restaurant.name} 
-            reservation={reservation} 
+          && <ReservationEntry
+            key={reservation.time}
+            restaurant={props.restaurant.name}
+            reservation={reservation}
             accept={props.onAcceptClick}
           />
           }
@@ -36,4 +41,5 @@ RestaurantEntry.propTypes = {
   }).isRequired,
   time: PropTypes.string.isRequired,
   party: PropTypes.string.isRequired,
+  onAcceptClick: PropTypes.func.isRequired,
 };

@@ -27,14 +27,3 @@ ReservationList.propTypes = {
     name: PropTypes.string,
   })).isRequired,
 };
-
-/* function Blog(props) {
-  const sidebar = (
-    <ul>
-      {props.posts.map((post) =>
-        <li key={post.id}>
-          {post.title}
-        </li>
-      )}
-    </ul>
-  ); */
