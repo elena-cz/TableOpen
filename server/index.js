@@ -6,7 +6,7 @@ const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
 // const { seedNewCity, queryCity } = require('../database/index.js');
 const { seedDatabase,
         formatCityResults,
-        getUserReservations,
+        getCustomerReservations,
         seedNewCity,
         queryCity,
         bookReservation,
@@ -14,7 +14,7 @@ const { seedDatabase,
 
 const PORT = 3000;
 const app = express();
-let visitedCities = ['San Francisco, CA'];
+const visitedCities = ['San Francisco, CA'];
 
 app.use(express.static(path.join(__dirname, '/../client/dist')));
 app.use(bodyParser.json());
@@ -74,16 +74,20 @@ app.post('/data/city', (request, response) => {
 
 app.post('/book', (request, response) => {
   bookReservation(request.body.reservationId, request.body.phoneNumber)
-    .then(results => response.send(results.rows));
+    .then(results => {
+      response.send(results);
+    });
 });
 
 app.put('/cancel', (request, response) => {
   cancelReservation(request.body.reservationId)
-    .then(results => response.send(results.rows));
+    .then(results => {
+      response.send(results.rows);
+    });
 });
 
-app.get('/phone', (request, response) => {
-  getUserReservations(request.body.phoneNumber)
+app.get('/user', (request, response) => {
+  getCustomerReservations(request.body.phoneNumber)
     .then(results => response.send(results.rows));
 });
 

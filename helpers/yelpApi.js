@@ -38,7 +38,7 @@ const getRestaurantsByCity = (cityAndState = 'San Francisco, CA', page = 0) => {
   const offset = page * 50;
   const parsedCityAndState = cityAndState.split(', ');
   const locationQuery = `${parsedCityAndState[0].split(' ').join('+')},+${parsedCityAndState[1]}`;
-  return axios.get(`https://api.yelp.com/v3/businesses/search?location=${locationQuery}&term=restaurants&limit=50&offset=${offset}`, yelpHeaders);
+  return axios.get(`https://api.yelp.com/v3/businesses/search?location=${locationQuery}&term=restaurants&limit=5&offset=${offset}`, yelpHeaders);
 };
 
 module.exports = {

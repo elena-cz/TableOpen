@@ -39,7 +39,6 @@ const generateFakeReservations = (restaurantId) => {
       [restaurantId, reservationTime, partySize]
     ));
   }
-
   return Promise.all(reservations);
 };
 
@@ -83,7 +82,7 @@ const seedDatabase = (location = 'San Francisco, CA') => {
   // an array of all the async Yelp queries we'll need to run
   const yelpQueries = [];
   // each page from Yelp has 50 restaurants; this will pull 1000 restaurants for a given city
-  for (let page = 1; page < 3; page += 1) {
+  for (let page = 1; page < 2; page += 1) {
     yelpQueries.push(getOnePageOfRestaurants(location, page));
   }
 
@@ -152,7 +151,7 @@ const queryCity = (city = 'San Francisco') => {
 };
 
 
-const createNewUser = (phoneNumber = '555-867-5309') => {
+const createNewCustomer = (phoneNumber = '555-867-5309') => {
   return new Promise((resolve, reject) => {
     Promise.resolve(client.query(
       `INSERT 
@@ -169,7 +168,7 @@ const createNewUser = (phoneNumber = '555-867-5309') => {
 };
 
 
-const getUserReservations = (phoneNumber = '555-867-5309') => {
+const getCustomerReservations = (phoneNumber = '555-867-5309') => {
   return new Promise((resolve, reject) => {
     Promise.resolve(client.query(
       `SELECT restaurants.name, restaurants.category, reservations.id, reservations.time, reservations.party_size, customers.phone 
@@ -194,42 +193,63 @@ const bookReservation = (reservationId, phoneNumber = '555-867-5309') => {
     Promise.resolve(client.query(
       `SELECT * 
       FROM customers 
-      WHERE customers.phone = $1,`,
-      [phoneNumber]))
-      .tap((results) => {
-        // user is an existing customer
-        if (results.rows[0]) {
-          throw results;
+      WHERE customers.phone = $1`,
+      [phoneNumber]
+    ))
+      .then((results) => {
+        if (results.rows.length) {
+          // user is an existing customer
+          Promise.resolve(client.query(
+            `UPDATE reservations
+            SET isReservationBooked = TRUE, customer_id = $1
+            WHERE reservations.id = $2
+            RETURNING reservations.id`,
+            [results.rows[0].id, reservationId]
+          ))
+            .then((bookingConfirmation) => {
+              resolve(bookingConfirmation);
+            })
+            .catch(err => reject(err));
+        } else {
+          Promise.resolve(client.query(
+            `INSERT 
+            INTO customers 
+            VALUES (DEFAULT, $1) RETURNING id`,
+            [phoneNumber]))
+            .then((customerId) => {
+              // Promise.resolve('hello');
+              Promise.resolve(client.query(
+                `UPDATE reservations
+                SET isReservationBooked = TRUE, customer_id = $1
+                WHERE reservations.id = $2 
+                RETURNING reservations.id`,
+                [customerId.rows[0].id, reservationId]
+              ))
+                .then((bookingConfirmation) => {
+                  resolve(bookingConfirmation);
+                })
+                .catch(err => reject(err));
+            })
+            .catch(err => reject(err));
         }
       })
-      .then(() => createNewUser(phoneNumber))
-      .catch((results) => {
-        Promise.resolve(client.query(
-          `UPDATE reservations
-          SET isReservationBooked = TRUE, customer_id = $1
-          WHERE reservation.id = $2
-          RETURNING reservation.id`,
-          [results.rows.id, reservationId]))
-      })
-      .then((bookingConfirmation) => {
-        resolve(bookingConfirmation);
-      })
-      .error(err => reject(err));
+      .catch(err => reject(err));
   });
 };
+
 
 const cancelReservation = (reservationId) => {
   return new Promise((resolve, reject) => {
     Promise.resolve(client.query(
       `UPDATE reservations
       SET isReservationBooked = FALSE, customer_id = NULL
-      WHERE reservation.id = $1
-      RETURNING reservation.id`,
+      WHERE reservations.id = $1
+      RETURNING reservations.id`,
       [reservationId]))
-      .then((bookingConfirmation) => {
-        resolve(bookingConfirmation);
+      .then((cancellingConfirmation) => {
+        resolve(cancellingConfirmation);
       })
-      .error(err => reject(err));
+      .catch(err => reject(err));
   });
 };
 
@@ -239,8 +259,8 @@ module.exports = {
   formatCityResults,
   seedNewCity,
   queryCity,
-  createNewUser,
-  getUserReservations,
+  createNewCustomer,
+  getCustomerReservations,
   bookReservation,
   cancelReservation,
 };
