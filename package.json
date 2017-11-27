@@ -14,7 +14,6 @@
     "db-init-first-time": "pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start && createdb tableopen && psql tableopen",
     "db-start": "pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start && psql tableopen",
     "db-stop": "pg_ctl -D /usr/local/var/postgres stop -s -m fast"
-
   },
   "dependencies": {
     "axios": "^0.17.1",
@@ -31,6 +30,7 @@
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
     "request": "^2.83.0",
+    "twilio": "^3.10.0",
     "underscore": "^1.8.3",
     "webpack": "^3.8.1"
   },
