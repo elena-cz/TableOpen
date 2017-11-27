@@ -1,13 +1,13 @@
-# Project Name
+# TableOpen
 
-> Pithy project description
+> An OpenTable clone. Search for available reservations at restaurants across the US and book (or cancel) reservations online. Users receive text message confirmations of 
 
 ## Team
 
-  - teamMember
-  - teamMember
-  - teamMember
-  - teamMember
+  - Bernard Kitchens
+  - Nick Gratzick
+  - Vlad Tretyakov
+  - Chadam Miller
 
 ## Table of Contents
 
