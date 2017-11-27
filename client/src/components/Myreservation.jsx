@@ -1,22 +1,31 @@
 import React from 'react';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 
-class Myreservation extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+const MyReservation = props => (
+  <div>
+    <ul>
+      <li>Restaurant: {props.reservation.restaurant}</li>
+      <li>Time: {moment(props.reservation.time).format('LT')}</li>
+      <li>Party Size: {props.reservation.party}</li>
+      <li>
+        <button onClick={() => props.cancel(props.index, props.reservation)}>
+          Cancel
+        </button>
+      </li>
+    </ul>
+  </div>
+);
 
-  render() {
-    return (
-      <div>
-        <ul>
-          <li>Restaurant: {this.props.reservation.restaurant}</li>
-          <li>Time: {moment(this.props.reservation.time).format('LT')}</li>
-          <li>Party: {this.props.reservation.party}</li>
-          <li><button onClick={() => { this.props.cancel(this.props.index, this.props.reservation) }} >Cancel</button></li>
-        </ul>
-      </div>);
-  }
-}
+export default MyReservation;
 
-export default Myreservation;
+MyReservation.propTypes = {
+  index: PropTypes.number.isRequired,
+  cancel: PropTypes.func.isRequired,
+  reservation: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    restaurant: PropTypes.string.isRequired,
+    time: PropTypes.string.isRequired,
+    party: PropTypes.number.isRequired,
+  }).isRequired,
+};

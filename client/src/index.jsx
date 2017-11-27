@@ -33,13 +33,13 @@ class App extends React.Component {
   componentWillMount() {
     const self = this;
     axios.get('/data')
-      .then((res) => {
+      .then((results) => {
         let timeData = {};
         let partySizeData = {};
         let categoryData = {};
 
         // Funnels all data into a corresponding object to remove duplicates
-        _.forEach(res.data, (restaurant) => {
+        _.forEach(results.data, (restaurant) => {
           _.forEach(restaurant.times, (time) => {
             timeData[time] = time;
           });
@@ -52,6 +52,7 @@ class App extends React.Component {
             categoryData[cat] = cat;
           });
         });
+
 
         timeData = ['All'].concat(Object.keys(timeData).sort((a, b) => {
           // Change two strings of times into numbers so we can easily compare them
@@ -69,7 +70,7 @@ class App extends React.Component {
         categoryData = ['All'].concat(Object.keys(categoryData).sort());
 
         self.setState({
-          data: res.data,
+          data: results.data,
           times: timeData,
           partySizes: partySizeData,
           categories: categoryData,
@@ -85,12 +86,24 @@ class App extends React.Component {
   }
 
   onPhoneNumberSubmitClick(phoneNumber) {
-    console.log(phoneNumber);
+    // console.log(phoneNumber, typeof phoneNumber);
     const self = this;
-    axios.get('/user', { phoneNumber })
-      .then((res) => {
+    axios.post('/user', { phoneNumber })
+      .then((userReservations) => {
+        // console.log(`userReservations: ${JSON.stringify(userReservations, null, 2)}`);
+        const myReservations = [];
+
+        userReservations.data.forEach((reservation) => {
+          myReservations.push({
+            id: reservation.id,
+            time: reservation.time.split('\"').join(''),
+            party: reservation.party_size,
+            restaurant: reservation.name,
+          });
+        });
+
         self.setState({
-          myReservations: res.data
+          myReservations
         });
       })
       .catch((err) => {
@@ -103,9 +116,9 @@ class App extends React.Component {
     console.log(city);
     const self = this;
     axios.post('/city', { city })
-      .then((res) => {
+      .then((results) => {
         self.setState({
-          data: res.data
+          data: results.data
         });
       })
       .catch((err) => {

@@ -1,27 +1,32 @@
 import React from 'react';
-import Myreservation from './Myreservation.jsx';
+import PropTypes from 'prop-types';
+import MyReservation from './Myreservation.jsx';
 
-class Myreservations extends React.Component {
-  constructor(props) {
-    super(props);
-  };
+const MyReservations = props => (
 
+  <div className="myReservations">
+  My Reservations
+    {(props.reservations.length === 0) ?
+      <div>No Reservations</div> : props.reservations.map((reservation, idx) =>
+        (
+          <MyReservation
+            reservation={reservation}
+            key={reservation.id}
+            index={idx}
+            cancel={props.onCancelClick}
+          />
+        ))}
+  </div>
+);
 
-  render() {
-    return (
-      <div className="myReservations">
-      My Reservations
-      {(this.props.reservations.length === 0) ? 
-        <div>No Reservations</div> : this.props.reservations.map((reservation, idx) => {
-        return (
-          <Myreservation reservation={reservation} 
-            key={idx} 
-            index={idx} 
-            cancel={this.props.onCancelClick} />
-            );
-      })}
-      </div>);
-  }
-}
+export default MyReservations;
 
-export default Myreservations;
+MyReservations.propTypes = {
+  onCancelClick: PropTypes.func.isRequired,
+  reservations: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    restaurant: PropTypes.string.isRequired,
+    time: PropTypes.string.isRequired,
+    party: PropTypes.number.isRequired,
+  })).isRequired,
+};
