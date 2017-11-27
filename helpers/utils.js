@@ -141,8 +141,6 @@ const queryCity = (city = 'San Francisco, CA') => {
     const temp = city.split(',');
     const City = temp[0];
     const State = temp[1].slice(1);
-
-    console.log(City, State);
     Promise.resolve(client.query(
       `SELECT restaurants.name, restaurants.category, restaurants.image, reservations.id, reservations.time, reservations.party_size 
       FROM reservations, restaurants 

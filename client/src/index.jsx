@@ -104,7 +104,6 @@ class App extends React.Component {
     const self = this;
     axios.post('/city', { city })
       .then((res) => {
-        console.log(res.data);
         self.setState({
           data: res.data
         });
