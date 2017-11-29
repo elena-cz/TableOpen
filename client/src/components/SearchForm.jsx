@@ -1,11 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
+import TextField from 'material-ui/TextField';
+import Button from 'material-ui/Button';
+
+const styles = theme => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit * 2,
+    width: 200,
+  },
+  menu: {
+    width: 200,
+  },
+  smallerField: {
+    marginRight: theme.spacing.unit * 2,
+    width: 80,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing.unit * 2,
+  },
+  button: {
+    margin: theme.spacing.unit,
+  },
+});
 
 class SearchForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       city: '',
+      state: '',
       partyFilter: 'All',
     };
 
@@ -14,39 +43,109 @@ class SearchForm extends React.Component {
 
   onStateChange(e) {
     this.setState({
-      [e.target.name]: e.target.value, 
+      [e.target.name]: e.target.value,
     });
   }
 
+  onFormSubmit(e) {
+    const { city, state, partyFilter } = this.state;
+    e.preventDefault();
+    this.props.onSearchSubmitClick(`${city}, ${state}`, partyFilter);
+  }
+
+
   render() {
-    const { city, partyFilter } = this.state;
-    const { onSearchSubmitClick } = this.props;
+    const { city, state, partyFilter } = this.state;
+    const { classes } = this.props;
+
+    const renderButton = () => {
+      if (city && state.length === 2) {
+        return (
+          <Button
+            type="submit"
+            raised
+            color="accent"
+            className={classes.button}
+          >
+            Find a Table
+          </Button>
+        );
+      }
+      return (
+        <Button
+          type="submit"
+          raised
+          disabled
+          className={classes.button}
+        >
+          Find a Table
+        </Button>
+      );
+    };
 
     return (
-      <div>
-        City:
-        <input
-          type="text"
+      <form
+        className={classes.container}
+        onSubmit={e => this.onFormSubmit(e)}
+      >
+        <TextField
+          className={classes.textField}
+          id="city"
           name="city"
-          placeholder="San Francisco, CA"
+          label="City"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          placeholder="San Francisco"
+          margin="normal"
+          value={city}
           onChange={this.onStateChange}
         />
-        Select Your Party Size
-        <select onChange={this.onStateChange} name="partyFilter">
-          {[2, 4, 6, 8].map(size =>
-            <option key={size} value={size}>{size}</option>)}
-        </select>
-        <button onClick={() =>
-          onSearchSubmitClick(city, partyFilter)}
+        <TextField
+          className={classes.smallerField}
+          id="state"
+          name="state"
+          label="State"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          placeholder="CA"
+          margin="normal"
+          value={state}
+          onChange={this.onStateChange}
+        />
+
+        <TextField
+          id="partyFilter"
+          select
+          label="Party Size"
+          className={classes.smallerField}
+          value={partyFilter}
+          onChange={this.onStateChange}
+          SelectProps={{
+            native: true,
+            MenuProps: {
+              className: classes.menu,
+            },
+          }}
+          margin="normal"
         >
-          Submit
-        </button>
-      </div>);
+          {[2, 4, 6, 8].map(option => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </TextField>
+
+        {renderButton()}
+      </form>);
   }
 }
 
-export default SearchForm;
+
+export default withStyles(styles)(SearchForm);
 
 SearchForm.propTypes = {
   onSearchSubmitClick: PropTypes.func.isRequired,
+  classes: PropTypes.object.isRequired,
 };
