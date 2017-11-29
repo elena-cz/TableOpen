@@ -2,9 +2,33 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import _ from 'underscore';
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import pink from 'material-ui/colors/pink';
+import indigo from 'material-ui/colors/indigo';
+import red from 'material-ui/colors/red';
 import Search from './components/Search.jsx';
 import AvailableReservations from './components/AvailableReservations.jsx';
 import Myreservations from './components/Myreservations.jsx';
+
+
+// Global theme
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      ...pink,
+      A800: '#ad1457',
+    },
+    secondary: {
+      ...indigo,
+      A700: '#303f9f',
+    },
+    error: red,
+  },
+});
+
+
+// Root component for app
 
 class App extends React.Component {
   constructor(props) {
@@ -238,31 +262,33 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <Search
-          phoneNumber={this.state.phoneNumber}
-          times={this.state.times}
-          partySizes={this.state.partySizes}
-          categories={this.state.categories}
-          onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
-          onCitySubmitClick={this.onCitySubmitClick}
-          onFilterSubmitClick={this.onFilterSubmitClick}
-          onRestaurantSubmitClick={this.onRestaurantSubmitClick}
-          onStateChange={this.onStateChange}
-        />
-        <div className="main">
-          <AvailableReservations
-            restaurantData={this.filterData()}
-            onAcceptClick={this.onAcceptClick}
-            time={this.state.time}
-            party={this.state.party}
+      <MuiThemeProvider theme={theme}>
+        <div>
+          <Search
+            phoneNumber={this.state.phoneNumber}
+            times={this.state.times}
+            partySizes={this.state.partySizes}
+            categories={this.state.categories}
+            onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
+            onCitySubmitClick={this.onCitySubmitClick}
+            onFilterSubmitClick={this.onFilterSubmitClick}
+            onRestaurantSubmitClick={this.onRestaurantSubmitClick}
+            onStateChange={this.onStateChange}
           />
-          <Myreservations
-            reservations={this.state.myReservations}
-            onCancelClick={this.onCancelClick} 
-          />
+          <div className="main">
+            <AvailableReservations
+              restaurantData={this.filterData()}
+              onAcceptClick={this.onAcceptClick}
+              time={this.state.time}
+              party={this.state.party}
+            />
+            <Myreservations
+              reservations={this.state.myReservations}
+              onCancelClick={this.onCancelClick} 
+            />
+          </div>
         </div>
-      </div>
+      </MuiThemeProvider>
     );
   }
 }
