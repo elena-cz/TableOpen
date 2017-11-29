@@ -5,10 +5,8 @@ const { client } = require('../database/index.js');
 const { sendConfirmationText, sendCancellationText } = require('../helpers/twilioApi.js');
 
 // Create 1-3 reservations for a given restaurant
-const generateFakeReservations = (restaurantId) => {
+const generateReservations = (restaurantId, time) => {
   const reservations = [];
-
-  const reservationCount = Math.ceil(Math.random() * 3);
   for (let i = 0; i < reservationCount; i += 1) {
     // 1) randomly generate the party size for this reservation
     const partySizeCalculator = Math.ceil(Math.random() * 6);
@@ -31,7 +29,7 @@ const generateFakeReservations = (restaurantId) => {
     Weighting of odds for start times is similar to dice probabilties
     7:30 is the most common start time, and 5pm/10pm are the least likely start times
     */
-    const reservationTime = moment().startOf('day').add(16 + (reservationTimeCalculator * 0.5), 'hours');
+    const reservationTime = moment().startOf('day').add(12 + (reservationTimeCalculator * 0.5), 'hours');
 
     // 3) insert this reservation into 'reservations' table in DB
     reservations.push(client.query(
@@ -95,7 +93,7 @@ const seedDatabase = (location = 'San Francisco, CA') => {
 
 const formatCityResults = (cityResults) => {
   const restaurants = {};
-
+  console.log('rows', cityResults.rows);
   _.forEach(cityResults.rows, (rest) => {
     if (restaurants.hasOwnProperty(rest.name)) {
       restaurants[rest.name].reservations.push({

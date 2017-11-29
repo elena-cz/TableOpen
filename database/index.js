@@ -1,49 +1,56 @@
 const postgres = require('pg');
 
-const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/tableopen';
-
-const client = new postgres.Client({
-  connectionString,
-  // ssl: true
+const knex = require('knex')({
+  client: 'postgres',
+  connection: {
+    host: '127.0.0.1',
+    user: 'luisalvarez',
+    password: 'scooby225',
+    database: 'tableopen',
+  },
 });
 
-client.connect();
+const bookshelf = require('bookshelf')(knex);
 
-// create schema for restaurants
-client.query('DROP TABLE restaurants');
-client.query(`
-  CREATE TABLE IF NOT EXISTS restaurants (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255),
-  category VARCHAR(255),
-  address VARCHAR(255),
-  city VARCHAR(255),
-  state VARCHAR(255),
-  zip VARCHAR(255),
-  url VARCHAR(255),
-  image VARCHAR(255),
-  phone VARCHAR(255),
-  review_count INT,
-  rating DECIMAL)`);
+const Customer = bookshelf.Model.extend(
+  {
+    tableName: 'customers',
+  },
+  {
+    byId(id) {
+      return this.forge().query({ where: { id } }).fetch();
+    },
+  }
+);
 
-// create schema for reservations
-client.query('DROP TABLE reservations');
-client.query(`
-  CREATE TABLE IF NOT EXISTS reservations (
-  id SERIAL PRIMARY KEY,
-  restaurant_id INT,
-  time VARCHAR(255),
-  party_size INT,
-  customer_id INT DEFAULT NULL,
-  isReservationBooked BOOLEAN DEFAULT FALSE)`);
+const Restaurant = bookshelf.Model.extend(
+  {
+    tableName: 'restaurants',
+  },
+  {
+    byId(id) {
+      return this.forge().query({ where: { id } }).fetch();
+    },
+  }
+);
 
-// create schema for customers
-client.query('DROP TABLE customers');
-client.query(`
-  CREATE TABLE IF NOT EXISTS customers (
-  id SERIAL PRIMARY KEY,
-  phone VARCHAR(255))`);
+//comma dangle does causes issue when run
+const Reservation = bookshelf.Model.extend(
+  {
+    tableName: 'reservations',
+  },
+  {
+    byId(id) {
+      return this.forge().query({ where: { id } }).fetch();
+    },
+  }
+);
 
 module.exports = {
-  client,
+  bookshelf,
+  knex,
+  Customer,
+  Restaurant,
+  Reservation,
 };
+

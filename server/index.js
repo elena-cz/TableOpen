@@ -3,13 +3,15 @@ const bodyParser = require('body-parser');
 const path = require('path');
 // const twilio = require('../helpers/twilioApi.js');
 const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
-const { seedDatabase,
-        formatCityResults,
-        saveNewCityData,
-        queryDatabaseForCity,
-        getCustomerReservations,
-        bookReservation,
-        cancelReservation } = require('../helpers/utils.js');
+const {
+ seedDatabase,
+  formatCityResults,
+  saveNewCityData,
+  queryDatabaseForCity,
+  getCustomerReservations,
+  bookReservation,
+  cancelReservation 
+} = require('../helpers/utils.js');
 
 const PORT = 3000;
 const app = express();
@@ -39,7 +41,7 @@ app.post('/city', (request, response) => {
     // If this is a new city: query Yelp for data, store it in DB, send data to client
     visitedCities.push(request.body.city);
     getRestaurantsByCity(request.body.city)
-      .then(yelpResults => saveNewCityData(yelpResults.data.businesses))
+      .then(yelpResults => saveNewCityData(yelpResults.businesses))
       .then(() => queryDatabaseForCity(request.body.city))
       .then(cityResults => response.send(formatCityResults(cityResults)))
       .catch((err) => {

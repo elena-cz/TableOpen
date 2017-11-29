@@ -1,5 +1,5 @@
 const axios = require('axios');
-const config = require('./config.js');
+// const config = require('./config.js');
 
 /*
 
@@ -27,18 +27,27 @@ https://www.yelp.com/developers/documentation/v3
 
 */
 
-const access = config.YELP_ACCESS_TOKEN;
+// const access = config.YELP_ACCESS_TOKEN;
 const yelpHeaders = {
   headers: {
-    Authorization: `Bearer ${access}`,
+    Authorization: 'Bearer',
   },
 };
 
-const getRestaurantsByCity = (cityAndState = 'San Francisco, CA', page = 0) => {
+const getRestaurantsByCity = (cityAndState, page = 0) => {
   const offset = page * 50;
   const parsedCityAndState = cityAndState.split(', ');
   const locationQuery = `${parsedCityAndState[0].split(' ').join('+')},+${parsedCityAndState[1]}`;
-  return axios.get(`https://api.yelp.com/v3/businesses/search?location=${locationQuery}&term=restaurants&limit=50&offset=${offset}`, yelpHeaders);
+  return axios.post('https://api.yelp.com/oauth2/token?client_id=vF-UDqkCAozh9YRaJRWy9w&client_secret=c1QEtIT3LxVHbVVusduJc1cdz3e3fe0B0huv5NFVuaeMbKvW9Yiumrgntvz66lT3').then((result) => result.data.access_token).then((result) => {
+    const yelpHeaders = {
+      headers: {
+        Authorization: `Bearer ${result}`,
+      },
+    };
+    return axios.get(`https://api.yelp.com/v3/businesses/search?location=${locationQuery}&term=restaurants&limit=50&offset=${offset}`, yelpHeaders).then((result) => {
+      return result.data;
+    });
+  });
 };
 
 module.exports = {
