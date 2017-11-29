@@ -1,14 +1,23 @@
-.main {
-	display: inline-flex;
+body {
+  font-family: 'Roboto', sans-serif;
 }
 
-.myReservations {
+h1 {
+  font-family: 'Roboto Slab', serif;
+}
+
+
+/*.main {
+	display: inline-flex;
+}
+*/
+/*.myReservations {
 	margin-left: 20px;
 }
 
 .availableReservations {
-
-}
+*/
+/*}*/
 
 ul {
 	list-style-type: none;

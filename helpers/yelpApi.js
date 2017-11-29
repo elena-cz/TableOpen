@@ -50,6 +50,7 @@ const getRestaurantsByCity = (cityAndState, page = 0) => {
     });
   });
 };
+
 module.exports = {
   getRestaurantsByCity,
 };
