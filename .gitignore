@@ -35,3 +35,6 @@ client/dist/bundle.js
 
 # Holder for credentials
 config.js
+
+# Package log for JSON
+package-lock.json
