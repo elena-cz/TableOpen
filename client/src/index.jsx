@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom';
 import axios from 'axios';
 import _ from 'underscore';
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import Grid from 'material-ui/Grid';
 import pink from 'material-ui/colors/pink';
 import indigo from 'material-ui/colors/indigo';
 import red from 'material-ui/colors/red';
+import TopMenu from './components/TopMenu.jsx';
 import Search from './components/Search.jsx';
 import AvailableReservations from './components/AvailableReservations.jsx';
 import Myreservations from './components/Myreservations.jsx';
@@ -15,9 +17,10 @@ import Myreservations from './components/Myreservations.jsx';
 
 const theme = createMuiTheme({
   palette: {
+    // primary: pink['800'],
     primary: {
       ...pink,
-      A800: '#ad1457',
+      500: '#ad1457',
     },
     secondary: {
       ...indigo,
@@ -48,9 +51,8 @@ class App extends React.Component {
     this.onAcceptClick = this.onAcceptClick.bind(this);
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
     this.onPhoneNumberSubmitClick = this.onPhoneNumberSubmitClick.bind(this);
-    this.onCitySubmitClick = this.onCitySubmitClick.bind(this);
+    this.onSearchSubmitClick = this.onSearchSubmitClick.bind(this);
     this.onCancelClick = this.onCancelClick.bind(this);
-    this.onRestaurantSubmitClick = this.onRestaurantSubmitClick.bind(this);
     this.onStateChange = this.onStateChange.bind(this);
   }
 
@@ -136,13 +138,18 @@ class App extends React.Component {
     // query db for reservations with this phone number
   }
 
-  onCitySubmitClick(city) {
+  onSearchSubmitClick(city, party) {
     console.log(city);
+
+    this.setState({
+      party,
+    });
+
     const self = this;
     axios.post('/city', { city })
       .then((results) => {
         self.setState({
-          data: results.data
+          data: results.data,
         });
       })
       .catch((err) => {
@@ -152,17 +159,12 @@ class App extends React.Component {
     // use api to retrieve new data for the city or restaurant
   }
 
-  onRestaurantSubmitClick(restaurant) {
-    this.setState({
-      restaurant
-    });
-  }
 
-  onFilterSubmitClick(time, party, category) {
+  onFilterSubmitClick(time, restaurant, category) {
     // filter avaiable restaurants
     this.setState({
       time,
-      party,
+      restaurant,
       category,
     });
   }
@@ -262,16 +264,15 @@ class App extends React.Component {
   render() {
     return (
       <MuiThemeProvider theme={theme}>
-        <div>
+        <TopMenu />
+        <Grid container spacing={24}>
           <Search
             phoneNumber={this.state.phoneNumber}
             times={this.state.times}
-            partySizes={this.state.partySizes}
             categories={this.state.categories}
             onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
-            onCitySubmitClick={this.onCitySubmitClick}
+            onSearchSubmitClick={this.onSearchSubmitClick}
             onFilterSubmitClick={this.onFilterSubmitClick}
-            onRestaurantSubmitClick={this.onRestaurantSubmitClick}
             onStateChange={this.onStateChange}
           />
           <div className="main">
@@ -283,10 +284,10 @@ class App extends React.Component {
             />
             <Myreservations
               reservations={this.state.myReservations}
-              onCancelClick={this.onCancelClick} 
+              onCancelClick={this.onCancelClick}
             />
           </div>
-        </div>
+        </Grid>
       </MuiThemeProvider>
     );
   }
