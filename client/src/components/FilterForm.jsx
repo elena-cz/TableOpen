@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class FilterMenu extends React.Component {
+class FilterForm extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      partyFilter: 'All',
       timeFilter: 'All',
+      restaurant: '',
       categoryFilter: 'All',
     };
 
@@ -21,31 +21,37 @@ class FilterMenu extends React.Component {
   }
 
   render() {
+
+    const { timeFilter, restaurant, categoryFilter } = this.state;
+    const { times, categories, onFilterSubmitClick } = this.props;
+
     return (
       <div>
         Select Your Desired Time
         <select onChange={this.onStateChange} name="timeFilter">
-          {this.props.times.map(time =>
+          {times.map(time =>
             <option key={time} value={time}>{time}</option>)}
         </select>
 
-        Select Your Party Size
-        <select onChange={this.onStateChange} name="partyFilter">
-          {this.props.partySizes.map(size =>
-            <option key={size} value={size}>{size}</option>)}
-        </select>
+        Restaurant:
+        <input
+          type="text"
+          name="restaurant"
+          placeholder="Search for restaurant by name"
+          onChange={this.onStateChange}
+        />
 
         Select Your Food Category
         <select onChange={this.onStateChange} name="categoryFilter">
-          {this.props.categories.map(category =>
+          {categories.map(category =>
             <option key={category} value={category}>{category}</option>)}
         </select>
 
         <button onClick={() => {
-          this.props.onFilterSubmitClick(
-            this.state.timeFilter,
-            this.state.partyFilter,
-            this.state.categoryFilter,
+          onFilterSubmitClick(
+            timeFilter,
+            restaurant,
+            categoryFilter,
             );
         }}
         >Submit
@@ -55,11 +61,10 @@ class FilterMenu extends React.Component {
   }
 }
 
-export default FilterMenu;
+export default FilterForm;
 
-FilterMenu.propTypes = {
+FilterForm.propTypes = {
   times: PropTypes.arrayOf(PropTypes.string).isRequired,
-  partySizes: PropTypes.arrayOf(PropTypes.string).isRequired,
   categories: PropTypes.arrayOf(PropTypes.string).isRequired,
   onFilterSubmitClick: PropTypes.func.isRequired,
 };
