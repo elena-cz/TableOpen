@@ -28,6 +28,7 @@ https://www.yelp.com/developers/documentation/v3
 */
 
 // const access = config.YELP_ACCESS_TOKEN;
+
 const yelpHeaders = {
   headers: {
     Authorization: 'Bearer',
@@ -49,7 +50,6 @@ const getRestaurantsByCity = (cityAndState, page = 0) => {
     });
   });
 };
-
 module.exports = {
   getRestaurantsByCity,
 };
