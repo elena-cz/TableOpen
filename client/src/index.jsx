@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import axios from 'axios';
 import _ from 'underscore';
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import Grid from 'material-ui/Grid';
 import pink from 'material-ui/colors/pink';
 import indigo from 'material-ui/colors/indigo';
@@ -27,6 +28,14 @@ const theme = createMuiTheme({
       A700: '#304ffe',
     },
     error: red,
+  },
+});
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    width: '100%',
+    height: '100%',
   },
 });
 
@@ -265,10 +274,10 @@ class App extends React.Component {
   }
 
   render() {
+    const { classes } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
         <TopMenu />
-        <Grid container spacing={24}>
           <Search
             phoneNumber={this.state.phoneNumber}
             times={this.state.times}
@@ -278,22 +287,21 @@ class App extends React.Component {
             onFilterSubmitClick={this.onFilterSubmitClick}
             onStateChange={this.onStateChange}
           />
-          <div className="main">
-            <AvailableReservations
-              restaurantData={this.filterData()}
-              onAcceptClick={this.onAcceptClick}
-              time={this.state.time}
-              party={this.state.party}
-            />
-            <Myreservations
-              reservations={this.state.myReservations}
-              onCancelClick={this.onCancelClick}
-            />
-          </div>
-        </Grid>
+          <AvailableReservations
+            restaurantData={this.filterData()}
+            onAcceptClick={this.onAcceptClick}
+            time={this.state.time}
+            party={this.state.party}
+          />
+          <Myreservations
+            reservations={this.state.myReservations}
+            onCancelClick={this.onCancelClick}
+          />
       </MuiThemeProvider>
     );
   }
 }
+
+export default withStyles(styles)(App);
 
 ReactDOM.render(<App />, document.getElementById('app'));

@@ -1,17 +1,38 @@
 import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
+import Button from 'material-ui/Button';
 
-const ReservationEntry = props =>
-  (
-    <div key={props.reservation.time}>
-    Reservation Time:{moment(props.reservation.time).format('LT')}<br />
-    Party Size: {props.reservation.people}
-      <button onClick={() => props.accept(props.reservation, props.restaurant)}>Accept
-      </button>
+
+const styles = theme => ({
+  pinkTitle: {
+    color: theme.palette.primary[500],
+  },
+  button: {
+    borderRadius: 5,
+    width: 60,
+    margin: 5,
+  },
+});
+
+const ReservationEntry = props => {
+  const { reservation, restaurant, accept, classes } = props;
+
+  return (
+    <div key={reservation.time}>
+      <Button 
+        raised
+        color="primary"
+        className={classes.button}
+        onClick={() => accept(reservation, restaurant)}
+      >
+        {moment(reservation.time).format('LT')}
+      </Button>
     </div>);
+}
 
-export default ReservationEntry;
+export default withStyles(styles)(ReservationEntry);
 
 ReservationEntry.propTypes = {
   accept: PropTypes.func.isRequired,

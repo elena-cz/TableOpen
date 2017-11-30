@@ -1,5 +1,10 @@
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: 'Roboto', sans-serif;
+  background-color: 'yellow';
 }
 
 h1 {
@@ -8,9 +13,9 @@ h1 {
 
 
 /*.main {
-	display: inline-flex;
-}
-*/
+	height: '100%';
+}*/
+
 /*.myReservations {
 	margin-left: 20px;
 }

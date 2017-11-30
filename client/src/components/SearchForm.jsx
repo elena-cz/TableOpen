@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
+import Typography from 'material-ui/Typography';
 
 const styles = theme => ({
   container: {
@@ -10,6 +11,11 @@ const styles = theme => ({
     flexWrap: 'wrap',
     marginBottom: theme.spacing.unit * 2,
     marginTop: theme.spacing.unit * 2,
+  },
+  blueHeadline: {
+    color: theme.palette.secondary['A700'],
+    fontWeight: 300,
+    marginLeft: theme.spacing.unit,
   },
   textField: {
     marginLeft: theme.spacing.unit,
@@ -39,6 +45,7 @@ class SearchForm extends React.Component {
       city: '',
       state: '',
       partyFilter: 'All',
+      showFormTip: false,
     };
 
     this.onStateChange = this.onStateChange.bind(this);
@@ -52,43 +59,30 @@ class SearchForm extends React.Component {
 
   onFormSubmit(e) {
     const { city, state, partyFilter } = this.state;
-    e.preventDefault();
-    this.props.onSearchSubmitClick(`${city}, ${state}`, partyFilter);
+
+    if (city === '' || state === '') {
+      e.preventDefault();
+      this.setState({
+        showFormTip: true,
+      });
+    } else {
+      this.setState({
+        showFormTip: false,
+      });
+      e.preventDefault();
+      this.props.onSearchSubmitClick(`${city}, ${state}`, partyFilter);
+    }
   }
 
 
   render() {
-    const { city, state, partyFilter } = this.state;
+    const { city, state, partyFilter, showFormTip } = this.state;
     const { classes } = this.props;
-
-    const renderButton = () => {
-      if (city && state.length === 2) {
-        return (
-          <Button
-            type="submit"
-            raised
-            color="accent"
-            className={classes.button}
-          >
-            Find a Table
-          </Button>
-        );
-      }
-      return (
-        <Button
-          type="submit"
-          raised
-          disabled
-          className={classes.button}
-        >
-          Find a Table
-        </Button>
-      );
-    };
 
 
     return (
       <div>
+        <h3 className={classes.blueHeadline} >Make restaurant reservations the easier way</h3>
         <form
           className={classes.container}
           onSubmit={e => this.onFormSubmit(e)}
@@ -142,8 +136,20 @@ class SearchForm extends React.Component {
             ))}
           </TextField>
 
-          {renderButton()}
+          <Button
+            type={(showFormTip) ? "null": "submit"}
+            raised
+            color="accent"
+            className={classes.button}
+          >
+            Find a Table
+          </Button>
         </form>
+        {(showFormTip) 
+          ? (<Typography type="caption" gutterBottom align="left" color="primary">
+            Enter a city and state
+          </Typography>)
+          : null }
       </div>
     );
   }
