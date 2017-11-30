@@ -35,22 +35,32 @@ const Search = (props) => {
   return (
     <Grid item xs={12}>
       <Paper className={classes.paper}>
-        <SearchForm
-          onSearchSubmitClick={onSearchSubmitClick}
-        />
-        <br />
-        <FilterForm
-          times={times}
-          categories={categories}
-          onFilterSubmitClick={onFilterSubmitClick}
-        />
-        <PhoneNumber
-          onPhoneNumberSubmitClick={onPhoneNumberSubmitClick}
-          phoneNumber={phoneNumber}
-          onStateChange={onStateChange}
-        />
-        <br />
-        <br />
+        <Grid
+          container
+          spacing={24}
+          alignItems="flex-end"
+          direction="row"
+          justify="center"
+        >
+          <Grid item xs={6}>
+            <SearchForm
+              onSearchSubmitClick={onSearchSubmitClick}
+            />
+            <br />
+            <FilterForm
+              times={times}
+              categories={categories}
+              onFilterSubmitClick={onFilterSubmitClick}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <PhoneNumber
+              onPhoneNumberSubmitClick={onPhoneNumberSubmitClick}
+              phoneNumber={phoneNumber}
+              onStateChange={onStateChange}
+            />
+          </Grid>
+        </Grid>
       </Paper>
     </Grid>
   );

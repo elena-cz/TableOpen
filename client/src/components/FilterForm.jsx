@@ -9,6 +9,7 @@ const styles = theme => ({
   container: {
     display: 'flex',
     flexWrap: 'wrap',
+    marginBottom: theme.spacing.unit * 2,
   },
   textField: {
     marginLeft: theme.spacing.unit,
@@ -19,6 +20,7 @@ const styles = theme => ({
     width: 200,
   },
   smallerField: {
+    marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit * 2,
     width: 80,
   },
@@ -28,10 +30,10 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
-  filterHeading: {
+  blueSmallHeading: {
     color: theme.palette.secondary['A700'],
     display: 'block',
-    marginBottom: 0,
+    marginLeft: theme.spacing.unit,
   },
 });
 
@@ -67,7 +69,7 @@ class FilterForm extends React.Component {
 
     return (
       <div>
-        <Typography className={classes.filterHeading} type="body2" >
+        <Typography className={classes.blueSmallHeading} type="body2" >
           Filter
         </Typography>
         <form
@@ -153,4 +155,5 @@ FilterForm.propTypes = {
   times: PropTypes.arrayOf(PropTypes.string).isRequired,
   categories: PropTypes.arrayOf(PropTypes.string).isRequired,
   onFilterSubmitClick: PropTypes.func.isRequired,
+  classes: PropTypes.object.isRequired,
 };
