@@ -6,8 +6,8 @@ module.exports = {
     client: 'postgresql',
     connection: {
       host: '127.0.0.1',
-      user: 'luisalvarez',
-      password: 'scooby225',
+      user: '',
+      password: '',
       database: 'tableopen',
       charset: 'utf8',
     },
@@ -17,8 +17,8 @@ module.exports = {
     client: 'postgresql',
     connection: {
       database: 'tableopen',
-      user: 'luisalvarez',
-      password: 'scooby225',
+      user: '',
+      password: '',
     },
     pool: {
       min: 2,
@@ -33,8 +33,8 @@ module.exports = {
     client: 'postgresql',
     connection: {
       database: 'tableopen',
-      user: 'luisalvarez',
-      password: 'scooby225',
+      user: '',
+      password: '',
     },
     pool: {
       min: 2,
