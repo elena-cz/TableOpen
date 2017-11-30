@@ -256,8 +256,3 @@ module.exports = {
   // bookReservation,
   // cancelReservation,
 };
-function newFunction() {
-  const reservationCalculator = Math.ceil(Math.random() * 10);
-  return reservationCalculator;
-}
-
