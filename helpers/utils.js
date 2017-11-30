@@ -28,49 +28,64 @@ const Reservation = require('../database/models/Reservations');
 //   }
 //   return Promise.all(reservations);
 // };
-
+const generatePopularity = (restaurant) => {
+  if (restaurant.review_count < 500) {
+    var popularity = 0;
+  }
+  if (restaurant.review_count > 500 && restaurant.review_count < 750) {
+    var reservationCalculator = newFunction();
+    if (reservationCalculator <= 5) {
+      var popularity = 0;
+    } else {
+      var popularity = 30;
+    }
+  }
+  if (restaurant.review_count > 750) {
+    var reservationCalculator = Math.ceil(Math.random() * 10);
+    if (reservationCalculator <= 5) {
+      var popularity = 0;
+    } else {
+      var popularity = 60;
+    }
+  }
+  return popularity;
+};
 const generateReservationTimes = (result, hour) => {
   const cityData = [];
   result.businesses.forEach((restaurant) => {
-    const restaurantData = [restaurant];
-    if (restaurant.review_count < 250) {
-      var popularity = 0;
-    }
-    if (restaurant.review_count > 250 && restaurant.review_count < 500) {
-      var popularity = 15;
-    }
-    if (restaurant.review_count > 500 && restaurant.review_count < 750) {
-      var reservationCalculator = Math.ceil(Math.random() * 10);
-      if (reservationCalculator <= 5) {
-        var popularity = 30;
-      } else {
-        var popularity = 45;
-      }
-    }
-    if (restaurant.review_count > 750) {
-      var reservationCalculator = Math.ceil(Math.random() * 10);
-      if (reservationCalculator <= 5) {
-        var popularity = 45;
-      } else {
-        var popularity = 60;
-      }
-    }
-    hour = hour || 7;
     const reservations = [];
-    for (let i = popularity; i < 60; i += 15) {
-      if (i.toString().length === 1) {
-        var minutes = `0${i}`;
-      } else {
-        var minutes = i;
+    for (let j = 5; j < 11; j++) {
+      var restaurantData = [restaurant];
+      var popularity = generatePopularity(restaurant);
+      for (let i = popularity; i < 60; i += 30) {
+        let partysize = Math.ceil((Math.random()) * 7) + 1;
+        if (partysize % 2 !== 0) {
+          partysize++;
+        }
+        if (popularity === 30) {
+          if (Math.ceil(Math.random() * 10) <= 5) {
+            var minutes = '00';
+          } else {
+            var minutes = `${30}`;
+          }
+        } else if (popularity === 0) {
+          if (i.toString().length === 1) {
+            var minutes = '00';
+          } else {
+            var minutes = `${30}`;
+          }
+        }
+        const time = `${j}:${minutes}pm`;
+        const singleReservation = [time, partysize];
+        reservations.push(singleReservation);
       }
-      const time = `${hour}:${minutes}pm`;
-      reservations.push(time);
     }
     restaurantData.push(reservations);
     cityData.push(restaurantData);
   });
   return cityData;
 };
+
 
 // (name, category, address, city, state, zip, phone, url, image, review_count, rating)
 const saveNewCityData = data => Promise.map(data, restaurant => db.addRestaurantToDataBase(restaurant.name, restaurant.categories[0].title, `${restaurant.location.address1} ${restaurant.location.address2} ${restaurant.location.address3}`, restaurant.location.city, restaurant.location.state, restaurant.location.zip_code, restaurant.display_phone, restaurant.url, restaurant.image_url, restaurant.review_count, restaurant.rating)).then((result) => {
@@ -241,3 +256,8 @@ module.exports = {
   // bookReservation,
   // cancelReservation,
 };
+function newFunction() {
+  const reservationCalculator = Math.ceil(Math.random() * 10);
+  return reservationCalculator;
+}
+

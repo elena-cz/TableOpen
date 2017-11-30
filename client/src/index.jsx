@@ -20,6 +20,7 @@ class App extends React.Component {
       time: 'All',
       party: 'All',
       category: 'All',
+      selectedRestaurant: [],
     };
     this.onAcceptClick = this.onAcceptClick.bind(this);
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
@@ -29,57 +30,6 @@ class App extends React.Component {
     this.onRestaurantSubmitClick = this.onRestaurantSubmitClick.bind(this);
     this.onStateChange = this.onStateChange.bind(this);
   }
-
-  componentWillMount() {
-    const self = this;
-    axios.get('/data')
-      .then((results) => {
-        let timeData = {};
-        let partySizeData = {};
-        let categoryData = {};
-
-        // Funnels all data into a corresponding object to remove duplicates
-        _.forEach(results.data, (restaurant) => {
-          _.forEach(restaurant.times, (time) => {
-            timeData[time] = time;
-          });
-
-          _.forEach(restaurant.partySizes, (size) => {
-            partySizeData[size] = size;
-          });
-
-          _.forEach(restaurant.categories, (cat) => {
-            categoryData[cat] = cat;
-          });
-        });
-
-
-        timeData = ['All'].concat(Object.keys(timeData).sort((a, b) => {
-          // Change two strings of times into numbers so we can easily compare them
-          // Ex: a = '5:00 PM' -> time1 = 500
-          //     b = '6:30 PM' -> time2 = 630
-          let time1 = a.split(' PM').join('').split(':');
-          time1 = (time1[0] * 100) + time1[1];
-
-          let time2 = b.split(' PM').join('').split(':');
-          time2 = (time2[0] * 100) + time2[1];
-
-          return parseInt(time1, 10) - parseInt(time2, 10);
-        }));
-        partySizeData = ['All'].concat(Object.keys(partySizeData).sort());
-        categoryData = ['All'].concat(Object.keys(categoryData).sort());
-
-        self.setState({
-          data: results.data,
-          times: timeData,
-          partySizes: partySizeData,
-          categories: categoryData,
-        });
-      }).catch((err) => {
-        throw err;
-      });
-  }
-
 
   onStateChange(e) {
     this.setState({ [e.target.name]: e.target.value });
@@ -103,7 +53,7 @@ class App extends React.Component {
         });
 
         self.setState({
-          myReservations
+          myReservations,
         });
       })
       .catch((err) => {
@@ -117,7 +67,7 @@ class App extends React.Component {
     axios.post('/city', { city })
       .then((results) => {
         self.setState({
-          data: results.data
+          data: results.data,
         });
       }).then(() =>{
         console.log(self.state.data);
@@ -125,13 +75,12 @@ class App extends React.Component {
       .catch((err) => {
         throw err;
       });
-
     // use api to retrieve new data for the city or restaurant
   }
 
   onRestaurantSubmitClick(restaurant) {
     this.setState({
-      restaurant
+      restaurant,
     });
   }
 
@@ -144,7 +93,6 @@ class App extends React.Component {
     });
   }
 
-
   onAcceptClick(reservation, restaurant) {
     // send data to db and repopulate my reservation list
     const myReservations = this.state.myReservations.slice(0);
@@ -152,7 +100,7 @@ class App extends React.Component {
       id: reservation.id,
       time: reservation.time,
       party: reservation.people,
-      restaurant: restaurant,
+      restaurant,
     });
 
     const restaurants = this.state.data.slice(0);
@@ -168,7 +116,7 @@ class App extends React.Component {
 
     this.setState({
       myReservations,
-      data: restaurants
+      data: restaurants,
     });
 
     axios.post('/book', {
@@ -201,7 +149,7 @@ class App extends React.Component {
 
     this.setState({
       myReservations,
-      data: restaurants
+      data: restaurants,
     });
 
     axios.put('/cancel', {
@@ -214,7 +162,6 @@ class App extends React.Component {
   }
 
   filterData() {
-
     // This function creates the datapoints that populate the various dropdown filters
     // Depends on the dataset coming from server
 
@@ -259,7 +206,7 @@ class App extends React.Component {
           />
           <Myreservations
             reservations={this.state.myReservations}
-            onCancelClick={this.onCancelClick} 
+            onCancelClick={this.onCancelClick}
           />
         </div>
       </div>

@@ -26,14 +26,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const visitedCities = ['San Francisco, CA'];
 
-// App will initially load with SF as the default city
-// app.get('/data', (request, response) => {
-//   queryDatabaseForCity()
-//     .then(cityResults => response.send(formatCityResults(cityResults)))
-//     .catch((err) => {
-//       throw err;
-//     });
-// });
 
 // Get restaurants and reservations for a particular city
 app.post('/city', (request, response) => {
