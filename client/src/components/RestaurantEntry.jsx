@@ -30,16 +30,16 @@ const RestaurantEntry = props =>
 
 export default RestaurantEntry;
 
-RestaurantEntry.propTypes = {
-  restaurant: PropTypes.shape({
-    name: PropTypes.string,
-    image_url: PropTypes.string,
-    reservations: PropTypes.arrayOf(PropTypes.shape({
-      time: PropTypes.string,
-      people: PropTypes.number,
-    })).isRequired,
-  }).isRequired,
-  time: PropTypes.string.isRequired,
-  party: PropTypes.string.isRequired,
-  onAcceptClick: PropTypes.func.isRequired,
-};
+// RestaurantEntry.propTypes = {
+//   restaurant: PropTypes.shape({
+//     name: PropTypes.string,
+//     image_url: PropTypes.string,
+//     reservations: PropTypes.arrayOf(PropTypes.shape({
+//       time: PropTypes.string,
+//       people: PropTypes.number,
+//     })).isRequired,
+//   }).isRequired,
+//   time: PropTypes.string.isRequired,
+//   party: PropTypes.string.isRequired,
+//   onAcceptClick: PropTypes.func.isRequired,
+// };
