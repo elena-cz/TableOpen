@@ -33,16 +33,16 @@ const Search = (props) => {
   } = props;
 
   return (
-    <Grid item xs={12}>
       <Paper className={classes.paper}>
         <Grid
+          className={classes.root}
           container
           spacing={24}
           alignItems="flex-end"
           direction="row"
           justify="center"
         >
-          <Grid item xs={6}>
+          <Grid item xs={7}>
             <SearchForm
               onSearchSubmitClick={onSearchSubmitClick}
             />
@@ -62,7 +62,6 @@ const Search = (props) => {
           </Grid>
         </Grid>
       </Paper>
-    </Grid>
   );
 };
 
