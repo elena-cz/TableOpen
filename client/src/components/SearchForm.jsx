@@ -10,7 +10,7 @@ const styles = theme => ({
     display: 'flex',
     flexWrap: 'wrap',
     marginBottom: theme.spacing.unit * 2,
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit,
   },
   blueHeadline: {
     color: theme.palette.secondary['A700'],
