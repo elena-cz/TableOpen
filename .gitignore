@@ -35,3 +35,4 @@ client/dist/bundle.js
 
 # Holder for credentials
 config.js
+knefile.js
