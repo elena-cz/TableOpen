@@ -47,9 +47,9 @@ class App extends React.Component {
     super(props);
     this.state = {
       data: [],
-      times: [],
-      partySizes: [],
-      categories: [],
+      times: ['', '5:00pm', '5:30pm', '6:00pm', '6:30pm', '7:00pm', '7:30pm', '8:00pm', '8:30pm', '9:00pm'],
+      partySizes: [2, 4, 6, 8],
+      categories: ['All'],
       myReservations: [],
       phoneNumber: '',
       restaurant: '',
@@ -65,55 +65,55 @@ class App extends React.Component {
     this.onStateChange = this.onStateChange.bind(this);
   }
 
-  componentWillMount() {
-    const self = this;
-    axios.get('/data')
-      .then((results) => {
-        let timeData = {};
-        let partySizeData = {};
-        let categoryData = {};
+  // componentWillMount() {
+  //   const self = this;
+  //   axios.get('/data')
+  //     .then((results) => {
+  //       let timeData = {};
+  //       let partySizeData = {};
+  //       let categoryData = {};
 
-        // Funnels all data into a corresponding object to remove duplicates
-        _.forEach(results.data, (restaurant) => {
-          _.forEach(restaurant.times, (time) => {
-            timeData[time] = time;
-          });
+  //       // Funnels all data into a corresponding object to remove duplicates
+  //       _.forEach(results.data, (restaurant) => {
+  //         _.forEach(restaurant.times, (time) => {
+  //           timeData[time] = time;
+  //         });
 
-          _.forEach(restaurant.partySizes, (size) => {
-            partySizeData[size] = size;
-          });
+  //         _.forEach(restaurant.partySizes, (size) => {
+  //           partySizeData[size] = size;
+  //         });
 
-          _.forEach(restaurant.categories, (cat) => {
-            categoryData[cat] = cat;
-          });
-        });
+  //         _.forEach(restaurant.categories, (cat) => {
+  //           categoryData[cat] = cat;
+  //         });
+  //       });
 
 
-        timeData = ['All'].concat(Object.keys(timeData).sort((a, b) => {
-          // Change two strings of times into numbers so we can easily compare them
-          // Ex: a = '5:00 PM' -> time1 = 500
-          //     b = '6:30 PM' -> time2 = 630
-          let time1 = a.split(' PM').join('').split(':');
-          time1 = (time1[0] * 100) + time1[1];
+  //       timeData = ['All'].concat(Object.keys(timeData).sort((a, b) => {
+  //         // Change two strings of times into numbers so we can easily compare them
+  //         // Ex: a = '5:00 PM' -> time1 = 500
+  //         //     b = '6:30 PM' -> time2 = 630
+  //         let time1 = a.split(' PM').join('').split(':');
+  //         time1 = (time1[0] * 100) + time1[1];
 
-          let time2 = b.split(' PM').join('').split(':');
-          time2 = (time2[0] * 100) + time2[1];
+  //         let time2 = b.split(' PM').join('').split(':');
+  //         time2 = (time2[0] * 100) + time2[1];
 
-          return parseInt(time1, 10) - parseInt(time2, 10);
-        }));
-        partySizeData = ['All'].concat(Object.keys(partySizeData).sort());
-        categoryData = ['All'].concat(Object.keys(categoryData).sort());
+  //         return parseInt(time1, 10) - parseInt(time2, 10);
+  //       }));
+  //       partySizeData = ['All'].concat(Object.keys(partySizeData).sort());
+  //       categoryData = ['All'].concat(Object.keys(categoryData).sort());
 
-        self.setState({
-          data: results.data,
-          times: timeData,
-          partySizes: partySizeData,
-          categories: categoryData,
-        });
-      }).catch((err) => {
-        throw err;
-      });
-  }
+  //       self.setState({
+  //         data: results.data,
+  //         times: timeData,
+  //         partySizes: partySizeData,
+  //         categories: categoryData,
+  //       });
+  //     }).catch((err) => {
+  //       throw err;
+  //     });
+  // }
 
 
   onStateChange(e) {
@@ -155,14 +155,26 @@ class App extends React.Component {
       party,
     });
 
-    const self = this;
+    // const self = this;
     axios.post('/city', { city })
       .then((results) => {
-        self.setState({
-          data: results.data,
+        // Populate restaurant data, and available categories 
+        const restaurantData = results.data;
+        console.log('restaurantData', restaurantData);
+
+        const allCategories = [];
+        restaurantData.forEach((restaurant) => {
+          restaurant[0].categories.forEach(category => allCategories.push(category.title));
+        });
+        const categoryList = _.uniq(['All', ...allCategories]);
+
+        this.setState({
+          data: restaurantData,
+          categories: categoryList,
         });
       }).then(() =>{
-        console.log(self.state.data);
+        console.log('Data', this.state.data);
+        console.log('categories', this.state.categories);
       })
       .catch((err) => {
         throw err;
@@ -182,40 +194,43 @@ class App extends React.Component {
   }
 
 
-  onAcceptClick(reservation, restaurant) {
+  onAcceptClick(reservationTime, restaurant) {
     // send data to db and repopulate my reservation list
     const myReservations = this.state.myReservations.slice(0);
     myReservations.push({
-      id: reservation.id,
-      time: reservation.time,
-      party: reservation.people,
+      // id: reservation.id,
+      time: reservationTime,
+      party: this.state.party,
       restaurant: restaurant,
     });
 
-    const restaurants = this.state.data.slice(0);
-    _.forEach(restaurants, (rest) => {
-      if (rest.name === restaurant) {
-        _.forEach(rest.reservations, (res) => {
-          if (res.id === reservation.id) {
-            res.booked = true;
-          }
-        });
-      }
-    });
+    // Commenting out until we update how we handle booked reservations
 
-    this.setState({
-      myReservations,
-      data: restaurants
-    });
+    // const restaurants = this.state.data.slice(0);
+    // _.forEach(restaurants, (rest) => {
+    //   if (rest.name === restaurant) {
+    //     _.forEach(rest.reservations, (res) => {
+    //       if (res.id === reservation.id) {
+    //         res.booked = true;
+    //       }
+    //     });
+    //   }
+    // });
 
-    axios.post('/book', {
-      reservationId: reservation.id,
-      phoneNumber: this.state.phoneNumber,
-    })
-      .then(() => console.log('we successfully booked a place!'))
-      .catch((err) => {
-        throw err;
-      });
+    // this.setState({
+    //   myReservations,
+    //   data: restaurants
+    // });
+
+    // axios.post('/book', {
+    //   reservationId: reservation.id,
+    //   phoneNumber: this.state.phoneNumber,
+    // })
+    //   .then(() => console.log('we successfully booked a place!'))
+    //   .catch((err) => {
+    //     throw err;
+    //   });
+      
     // update reservation with a phone number
     // add reservation to myReservations
   }
@@ -250,26 +265,43 @@ class App extends React.Component {
       });
   }
 
-  filterData() {
+  filterRestaurants() {
 
     // This function creates the datapoints that populate the various dropdown filters
     // Depends on the dataset coming from server
 
-    const filters = {
-      times: this.state.time,
-      partySizes: this.state.party === 'All' ? 'All' : Number(this.state.party),
-      categories: this.state.category,
-      name: this.state.restaurant,
-    };
+    const { data, time, party, category, restaurant, restaurantData } = this.state
 
-    let filteredData = this.state.data.slice(0);
 
-    _.forEach(filters, (filter, key) => {
-      if (filter !== 'All' && filter !== '') {
-        filteredData = _.filter(filteredData, restaurant =>
-          restaurant[key].includes(filter));
-      }
+    // let filteredData =  [...data];
+
+    let filteredData = _.filter([...data], allInfo => {
+      const restaurantInfo = allInfo[0];
+      const categories = restaurantInfo.categories.map(category => category.title);
+      const restaurantName = restaurantInfo.name.toLowerCase().trim();
+
+      return (
+        (category === 'All' || categories.includes(category)) && 
+        (restaurant === '' || restaurantName.contains(restaurant.toLowerCase().trim()))
+      );
+
     });
+
+    // const filters = {
+    //   times: time,
+    //   // partySizes: (party === 'All') ? 'All' : Number(party),
+    //   categories: category,
+    //   name: restaurant,
+    // };
+
+    // let filteredData =  [...data];
+
+    // _.forEach(filters, (filter, key) => {
+    //   if (filter !== 'All' && filter !== '') {
+    //     filteredData = _.filter(filteredData, restaurant =>
+    //       restaurant[key].includes(filter));
+    //   }
+    // });
     return filteredData;
   }
 
@@ -288,7 +320,7 @@ class App extends React.Component {
             onStateChange={this.onStateChange}
           />
           <AvailableReservations
-            restaurantData={this.filterData()}
+            restaurantData={this.filterRestaurants()}
             onAcceptClick={this.onAcceptClick}
             time={this.state.time}
             party={this.state.party}

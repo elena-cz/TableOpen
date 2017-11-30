@@ -27,28 +27,35 @@ const styles = theme => ({
 
 const RestaurantEntry = (props) => {
 
-  const { restaurant, time, party, onAcceptClick, classes } = props;
+  const { restaurantInfo, time, party, onAcceptClick, classes } = props;
+
+  const restaurant = restaurantInfo[0];
+  console.log('restaurantInfo[1]', restaurantInfo[1]);
+  const reservationTimesForParty = restaurantInfo[1].map(reservation => (reservation[1] === party) ? reservation[0]: null);
+  console.log('reservationTimesForParty', reservationTimesForParty);k
+  // if (restaurant[1].length ) {
+  //   return null;
+  // }
 
   return (
-    <Grid item xs={4} >
-      <div>
+    <Grid item xs={12} >
+      <Grid container>
+        <Grid item xs={3}>
+          <img width="90%" src={restaurant.image_url} alt="pic of restaurant" />
+        </Grid>
+        <Grid item xs={9}>
         <Typography type="title" gutterBottom className="classes.pinkTitle">{restaurant.name}</Typography>
-        <img width="90%" src={restaurant.image_url} alt="pic of restaurant" />
-        {restaurant.reservations.map(reservation =>
+        {reservationTimesForParty.map(time =>
           (
-            <div key={reservation.id}>{
-            (moment(reservation.time).format('LT') === time || time === 'All')
-            && (reservation.people.toString() === party || party === 'All')
-            && (!reservation.booked)
-            && <ReservationEntry
-              key={reservation.time}
+             <ReservationEntry
+              key={time}
               restaurant={restaurant.name}
-              reservation={reservation}
+              reservationTime={time}
               accept={onAcceptClick}
             />
-            }
-            </div>))}
-      </div>
+        ))}
+        </Grid>
+      </Grid>
     </Grid>
     );
 }

@@ -13,21 +13,23 @@ const styles = theme => ({
     borderRadius: 5,
     width: 60,
     margin: 5,
+    display: 'inline-block'
   },
 });
 
 const ReservationEntry = props => {
-  const { reservation, restaurant, accept, classes } = props;
+  const { reservationTime, restaurant, accept, classes } = props;
+  console.log(reservationTime);
 
   return (
-    <div key={reservation.time}>
+    <div key={reservationTime}>
       <Button 
         raised
         color="primary"
         className={classes.button}
-        onClick={() => accept(reservation, restaurant)}
+        onClick={() => accept(reservationTime, restaurant)}
       >
-        {moment(reservation.time).format('LT')}
+        {reservationTime}
       </Button>
     </div>);
 }
@@ -37,8 +39,5 @@ export default withStyles(styles)(ReservationEntry);
 ReservationEntry.propTypes = {
   accept: PropTypes.func.isRequired,
   restaurant: PropTypes.string.isRequired,
-  reservation: PropTypes.shape({
-    time: PropTypes.string,
-    people: PropTypes.number,
-  }).isRequired,
+  reservationTime: PropTypes.string.isRequired,
 };
