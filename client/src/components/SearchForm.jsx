@@ -8,6 +8,8 @@ const styles = theme => ({
   container: {
     display: 'flex',
     flexWrap: 'wrap',
+    marginBottom: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit * 2,
   },
   textField: {
     marginLeft: theme.spacing.unit,
@@ -18,6 +20,7 @@ const styles = theme => ({
     width: 200,
   },
   smallerField: {
+    marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit * 2,
     width: 80,
   },
@@ -83,62 +86,66 @@ class SearchForm extends React.Component {
       );
     };
 
+
     return (
-      <form
-        className={classes.container}
-        onSubmit={e => this.onFormSubmit(e)}
-      >
-        <TextField
-          className={classes.textField}
-          id="city"
-          name="city"
-          label="City"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          placeholder="San Francisco"
-          margin="normal"
-          value={city}
-          onChange={this.onStateChange}
-        />
-        <TextField
-          className={classes.smallerField}
-          id="state"
-          name="state"
-          label="State"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          placeholder="CA"
-          margin="normal"
-          value={state}
-          onChange={this.onStateChange}
-        />
-
-        <TextField
-          id="partyFilter"
-          select
-          label="Party Size"
-          className={classes.smallerField}
-          value={partyFilter}
-          onChange={this.onStateChange}
-          SelectProps={{
-            native: true,
-            MenuProps: {
-              className: classes.menu,
-            },
-          }}
-          margin="normal"
+      <div>
+        <form
+          className={classes.container}
+          onSubmit={e => this.onFormSubmit(e)}
         >
-          {[2, 4, 6, 8].map(option => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </TextField>
+          <TextField
+            className={classes.textField}
+            id="city"
+            name="city"
+            label="City"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            placeholder="San Francisco"
+            margin="normal"
+            value={city}
+            onChange={this.onStateChange}
+          />
+          <TextField
+            className={classes.smallerField}
+            id="state"
+            name="state"
+            label="State"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            placeholder="CA"
+            margin="normal"
+            value={state}
+            onChange={this.onStateChange}
+          />
 
-        {renderButton()}
-      </form>);
+          <TextField
+            id="partyFilter"
+            select
+            label="Party Size"
+            className={classes.smallerField}
+            value={partyFilter}
+            onChange={this.onStateChange}
+            SelectProps={{
+              native: true,
+              MenuProps: {
+                className: classes.menu,
+              },
+            }}
+            margin="normal"
+          >
+            {[2, 4, 6, 8].map(option => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </TextField>
+
+          {renderButton()}
+        </form>
+      </div>
+    );
   }
 }
 
