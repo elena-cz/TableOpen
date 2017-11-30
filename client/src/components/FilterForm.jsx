@@ -1,5 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
+import TextField from 'material-ui/TextField';
+import Button from 'material-ui/Button';
+import Typography from 'material-ui/Typography';
+
+const styles = theme => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit * 2,
+    width: 200,
+  },
+  menu: {
+    width: 200,
+  },
+  smallerField: {
+    marginRight: theme.spacing.unit * 2,
+    width: 80,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing.unit * 2,
+  },
+  button: {
+    margin: theme.spacing.unit,
+  },
+  filterHeading: {
+    color: theme.palette.secondary['A700'],
+    display: 'block',
+    marginBottom: 0,
+  },
+});
 
 class FilterForm extends React.Component {
   constructor(props) {
@@ -20,48 +54,100 @@ class FilterForm extends React.Component {
     });
   }
 
+  onFormSubmit(e) {
+    const { timeFilter, restaurant, categoryFilter } = this.state;
+    e.preventDefault();
+    this.props.onFilterSubmitClick(timeFilter, restaurant, categoryFilter );
+  }
+
   render() {
 
     const { timeFilter, restaurant, categoryFilter } = this.state;
-    const { times, categories, onFilterSubmitClick } = this.props;
+    const { times, categories, classes } = this.props;
 
     return (
       <div>
-        Select Your Desired Time
-        <select onChange={this.onStateChange} name="timeFilter">
-          {times.map(time =>
-            <option key={time} value={time}>{time}</option>)}
-        </select>
+        <Typography className={classes.filterHeading} type="body2" >
+          Filter
+        </Typography>
+        <form
+          className={classes.container}
+          onSubmit={e => this.onFormSubmit(e)}
+        >
+          <TextField
+            id="timeFilter"
+            name="timeFilter"
+            select
+            label="Time"
+            className={classes.smallerField}
+            value={timeFilter}
+            onChange={this.onStateChange}
+            SelectProps={{
+              native: true,
+              MenuProps: {
+                className: classes.menu,
+              },
+            }}
+            margin="normal"
+          >
+            {times.map(option => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </TextField>
 
-        Restaurant:
-        <input
-          type="text"
-          name="restaurant"
-          placeholder="Search for restaurant by name"
-          onChange={this.onStateChange}
-        />
+          <TextField
+            className={classes.textField}
+            id="restaurant"
+            name="restaurant"
+            label="Restaurant Name"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            margin="normal"
+            value={restaurant}
+            onChange={this.onStateChange}
+          />
 
-        Select Your Food Category
-        <select onChange={this.onStateChange} name="categoryFilter">
-          {categories.map(category =>
-            <option key={category} value={category}>{category}</option>)}
-        </select>
+          <TextField
+            id="categoryFilter"
+            name="categoryFilter"
+            select
+            label="Category"
+            className={classes.smallerField}
+            value={categoryFilter}
+            onChange={this.onStateChange}
+            SelectProps={{
+              native: true,
+              MenuProps: {
+                className: classes.menu,
+              },
+            }}
+            margin="normal"
+          >
+            {categories.map(option => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </TextField>
 
-        <button onClick={() => {
-          onFilterSubmitClick(
-            timeFilter,
-            restaurant,
-            categoryFilter,
-            );
-        }}
-        >Submit
-        </button>
+          <Button
+            type="submit"
+            color="accent"
+            className={classes.button}
+          >
+            Save
+          </Button>
+        </form>
       </div>
     );
   }
 }
 
-export default FilterForm;
+
+export default withStyles(styles)(FilterForm);
 
 FilterForm.propTypes = {
   times: PropTypes.arrayOf(PropTypes.string).isRequired,
