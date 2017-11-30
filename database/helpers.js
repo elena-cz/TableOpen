@@ -1,4 +1,6 @@
-const db = require('./index');
+const bookshelf = require('./index').bookshelf;
+const Restaurant = require('./models/Restaurants');
+const Reservation = require('./models/Reservations');
 
 const addCustomerToDataBase = (name, phone) => {
   const customer = new db.Customer();
@@ -10,7 +12,7 @@ const addCustomerToDataBase = (name, phone) => {
 
 const grabCustomerById = id => db.Customer.byId(id);
 
-const addRestaurantToDataBase = (name, category, address, city, state, zip, phone, review_count, rating) => {
+const addRestaurantToDataBase = (name, category, address, city, state, zip, phone, url, image, review_count, rating) => {
   const data = {
     name,
     category,
@@ -21,14 +23,16 @@ const addRestaurantToDataBase = (name, category, address, city, state, zip, phon
     phone,
     review_count,
     rating,
+    url,
+    image,
   };
-  db.Restaurant.forge(data).save().then(restaurant => restaurant);
+  return Restaurant.forge(data).save().then(restaurant => restaurant);
 };
 
-const addReservationToDatabase = (restaurant_id, isReservationBooked) => {
-  const reservation = new db.Reservation();
-  const data = { restaurant_id, isReservationBooked: false };
-  db.Reservation.forge(data).save().then(reservation => reservation);
+const addReservationToDatabase = (restaurant_id, isReservationBooked, party_size, customer_id, time) => {
+  const reservation = new Reservation();
+  const data = { restaurant_id, isReservationBooked, party_size, customer_id, time };
+  return Reservation.forge(data).save().then(reservation => reservation);
 };
 
 module.exports = {

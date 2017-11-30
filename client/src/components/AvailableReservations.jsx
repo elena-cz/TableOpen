@@ -7,14 +7,14 @@ const AvailableReservations = props =>
     <div>
       Available Reservations
       <div>RESTAURANTS: {props.restaurantData.length}</div>
-      {props.restaurantData.map(restaurant =>
+      {/* {props.restaurantData.map(restaurant =>
         (<RestaurantEntry
           key={restaurant.name}
           restaurant={restaurant}
           time={props.time}
           party={props.party}
           onAcceptClick={props.onAcceptClick}
-        />))}
+        />))} */}
     </div>
   );
 

@@ -113,13 +113,14 @@ class App extends React.Component {
   }
 
   onCitySubmitClick(city) {
-    console.log(city);
     const self = this;
     axios.post('/city', { city })
       .then((results) => {
         self.setState({
           data: results.data
         });
+      }).then(() =>{
+        console.log(self.state.data);
       })
       .catch((err) => {
         throw err;
