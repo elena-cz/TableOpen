@@ -24,7 +24,7 @@ const theme = createMuiTheme({
     },
     secondary: {
       ...indigo,
-      A700: '#303f9f',
+      A700: '#304ffe',
     },
     error: red,
   },
