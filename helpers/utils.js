@@ -11,7 +11,6 @@ const Restaurant = require('../database/models/Restaurants');
 const SearchedCity = require('../database/models/SearchedCities');
 
 
-
 const alreadySearched = city => SearchedCity.query({
   where: {
     city,
@@ -19,9 +18,7 @@ const alreadySearched = city => SearchedCity.query({
 }).fetchAll()
   .then((results) => {
     if (results.length === 0) {
-      return db.addCityToDatabase(city).then((result) => {
-        return false;
-      });
+      return db.addCityToDatabase(city).then((result) => false);
     }
     return true;
   });
@@ -57,13 +54,11 @@ const isBooked = (popularity) => {
 };
 
 const generateReservationTimes = (data) => {
-  console.log('data', data);
   const promise = [];
   data.forEach((restaurant) => {
     for (let j = 5; j < 11; j++) {
       for (let i = 0; i < 10; i++) {
         let popularity = generatePopularity(restaurant.attributes);
-        console.log('pop', popularity);
         let isReservationBooked = isBooked(popularity);
         promise.push(db.addReservationToDatabase(restaurant.id, isReservationBooked, 2, null, `${j}:00`));
         popularity = generatePopularity(restaurant.attributes);
@@ -100,7 +95,7 @@ const generateReservationTimes = (data) => {
 };
 
 // (name, category, address, city, state, zip, phone, url, image, review_count, rating)
-const saveNewCityData = data => Promise.map(data.businesses, restaurant => db.addRestaurantToDataBase(restaurant.name, restaurant.categories[0].title, `${restaurant.location.address1} ${restaurant.location.address2} ${restaurant.location.address3}`, restaurant.location.city, restaurant.location.state, restaurant.location.zip_code, restaurant.display_phone, restaurant.url, restaurant.image_url, restaurant.review_count, restaurant.rating, 'hello')).then(res => res);
+const saveNewCityData = data => Promise.map(data.businesses, restaurant => db.addRestaurantToDataBase(restaurant.name, restaurant.categories[0].title, `${restaurant.location.address1} ${restaurant.location.address2} ${restaurant.location.address3}`, restaurant.location.city, restaurant.location.state, restaurant.location.zip_code, restaurant.display_phone, restaurant.url, restaurant.image_url, restaurant.review_count, restaurant.rating, '')).then(res => res);
 
 
 // const formatCityResults = (cityResults) => {
@@ -127,23 +122,28 @@ const saveNewCityData = data => Promise.map(data.businesses, restaurant => db.ad
 
 
 const queryDatabaseForCity = (city, party_size) => new Promise((resolve, reject) => {
-  Reservation.query({
+  Restaurant.query({
     where: {
-      isReservationBooked: false, party_size: 8,
+      city,
     },
-  }).fetchAll({ withRelated: ['restaurant'] }).then((data) => {
-    return data;
-  }).then((results) => {
+  }).fetchAll({ withRelated: ['reservation'] }).then((data) => data).then((results) => {
     resolve(results);
   });
 }).then((reservations) => {
-  var arrayHolder = [];
-  return Promise.map(reservations.models, (item) =>{
-    if (item.relations.restaurant.attributes.city === 'San Diego') {
-      arrayHolder.push(item);
+  const restaurants = [];
+  return Promise.map(reservations.models, (item) => {
+    const limit = {};
+    let arrayHolder = [];
+    for (let i = 0; i < item.relations.reservation.models.length; i++) {
+      if (item.relations.reservation.models[i].attributes.isReservationBooked === false && item.relations.reservation.models[i].attributes.party_size === party_size && limit[`${item.relations.reservation.models[i].attributes.party_size}${item.relations.reservation.models[i].attributes.time}`] !== true) {
+        arrayHolder.push(item.relations.reservation.models[i].attributes);
+        limit[`${item.relations.reservation.models[i].attributes.party_size}${item.relations.reservation.models[i].attributes.time}`] = true;
+      }
     }
+    item.attributes.reservations = arrayHolder;
+    restaurants.push(item.attributes);
   }).then(() => {
-    return arrayHolder;
+    return restaurants;
   });
 });
 

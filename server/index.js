@@ -44,9 +44,12 @@ app.post('/city', (request, response) => {
 });
 
 app.post('/reservations', (req, res) => {
+  console.log(req.body.partySize);
   let city = req.body.city.split(',')[0];
   city = city.slice(0,1).toUpperCase() + city.slice(1,city.length).toLowerCase();
-  queryDatabaseForCity('Berkeley', req.body.partySize).then((data) => {
+  city = city.split(' ');
+  const formattedCity = `${city[0]} ${city[1].slice(0,1).toUpperCase() + city[1].slice(1,city[1].length)}`;
+  queryDatabaseForCity(formattedCity, req.body.partySize).then((data) => {
     res.status(200);
     res.send(JSON.stringify(data));
   });
