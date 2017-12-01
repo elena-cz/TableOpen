@@ -16,6 +16,12 @@ import Home from './components/Home.jsx';
 import SignUp from './components/SignUp.jsx';
 import TopMenu from './components/TopMenu';
 import LoginError from './components/Error.jsx';
+import Search from './components/Search';
+import AvailableReservations from './components/AvailableReservations';
+import Myreservations from './components/Myreservations';
+import OwnerFloorPlan from './components/OwnerFloorPlan';
+
+
 // Global theme
 
 const theme = createMuiTheme({
@@ -39,17 +45,17 @@ class App extends React.Component {
   render() {
     const { classes } = this.props;
     return (
-     <MuiThemeProvider theme={theme}>
-      <Router>
-      <div>
-        <TopMenu />
-        <Route exact path='/' component={LoginPage} />
-        <Route path='/home' component={Home}/>
-        <Route path='/signup' component={SignUp}/>
-        <Route path='/error' component={LoginError}/>
-      </div>
-      </Router>
-     </MuiThemeProvider>
+      <MuiThemeProvider theme={theme}>
+        <Router>
+          <div>
+            <TopMenu />
+            <Route exact path='/' component={LoginPage} />
+            <Route path='/home' component={Home}/>
+            <Route path='/signup' component={SignUp}/>
+            <Route path='/error' component={LoginError}/>
+          </div>
+        </Router>
+      </MuiThemeProvider>
     )
   }
 }
