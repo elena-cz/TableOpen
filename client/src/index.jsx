@@ -68,8 +68,8 @@ class App extends React.Component {
       .then((results) => {
         console.log(results);
         if (results) {
-          axios.post('/reservations', { partySize: 8 }).then((data) => {
-            console.log('howdy', data.data);
+          axios.post('/reservations', { city, partySize: 8 }).then((data) => {
+            console.log(data.data);
           });
         }
         // use api to retrieve new data for the city or restaurant
