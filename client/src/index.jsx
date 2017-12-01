@@ -2,34 +2,69 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import _ from 'underscore';
-import Search from './components/Search.jsx';
-import AvailableReservations from './components/AvailableReservations.jsx';
-import Myreservations from './components/Myreservations.jsx';
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
+import pink from 'material-ui/colors/pink';
+import indigo from 'material-ui/colors/indigo';
+import red from 'material-ui/colors/red';
+import TopMenu from './components/TopMenu';
+import Search from './components/Search';
+import AvailableReservations from './components/AvailableReservations';
+import Myreservations from './components/Myreservations';
+
+
+// Global theme
+
+const theme = createMuiTheme({
+  palette: {
+    // primary: pink['800'],
+    primary: {
+      ...pink,
+      500: '#ad1457',
+    },
+    secondary: {
+      ...indigo,
+      A700: '#304ffe',
+    },
+    error: red,
+  },
+});
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    width: '100%',
+    height: '100%',
+  },
+});
+
+
+// Root component for app
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       data: [],
-      times: [],
-      partySizes: [],
-      categories: [],
+      times: ['', '5:00pm', '5:30pm', '6:00pm', '6:30pm', '7:00pm', '7:30pm', '8:00pm', '8:30pm', '9:00pm'],
+      partySizes: [2, 4, 6, 8],
+      categories: ['All'],
       myReservations: [],
       phoneNumber: '',
       restaurant: '',
       time: 'All',
-      party: 'All',
+      party: 2,
       category: 'All',
       selectedRestaurant: [],
     };
     this.onAcceptClick = this.onAcceptClick.bind(this);
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
     this.onPhoneNumberSubmitClick = this.onPhoneNumberSubmitClick.bind(this);
-    this.onCitySubmitClick = this.onCitySubmitClick.bind(this);
+    this.onSearchSubmitClick = this.onSearchSubmitClick.bind(this);
     this.onCancelClick = this.onCancelClick.bind(this);
-    this.onRestaurantSubmitClick = this.onRestaurantSubmitClick.bind(this);
     this.onStateChange = this.onStateChange.bind(this);
   }
+
 
   onStateChange(e) {
     this.setState({ [e.target.name]: e.target.value });
@@ -62,15 +97,33 @@ class App extends React.Component {
     // query db for reservations with this phone number
   }
 
-  onCitySubmitClick(city) {
-    const self = this;
+
+  onSearchSubmitClick(city, party) {
+    console.log(city);
+
+    this.setState({
+      party,
+    });
+
+    // const self = this;
     axios.post('/city', { city })
       .then((results) => {
-        self.setState({
-          data: results.data,
+        const restaurantData = results.data;
+
+        // Get available categories from all restaurants
+        let categories = [];
+        restaurantData.forEach((restaurant) => {
+          restaurant[0].categories.forEach(category => categories.push(category.title));
         });
-      }).then(() =>{
-        console.log(self.state.data);
+        categories = _.uniq(['All', ...categories]);
+
+        // Save data to state
+        this.setState({
+          data: restaurantData,
+          categories,
+        });
+      }).then(() => {
+        console.log('Data', this.state.data);
       })
       .catch((err) => {
         throw err;
@@ -78,55 +131,53 @@ class App extends React.Component {
     // use api to retrieve new data for the city or restaurant
   }
 
-  onRestaurantSubmitClick(restaurant) {
-    this.setState({
-      restaurant,
-    });
-  }
 
-  onFilterSubmitClick(time, party, category) {
+  onFilterSubmitClick(time, restaurant, category) {
     // filter avaiable restaurants
     this.setState({
       time,
-      party,
+      restaurant,
       category,
     });
   }
 
-  onAcceptClick(reservation, restaurant) {
+  onAcceptClick(reservationTime, restaurant) {
     // send data to db and repopulate my reservation list
     const myReservations = this.state.myReservations.slice(0);
     myReservations.push({
-      id: reservation.id,
-      time: reservation.time,
-      party: reservation.people,
+      // id: reservation.id,
+      time: reservationTime,
+      party: this.state.party,
       restaurant,
     });
 
-    const restaurants = this.state.data.slice(0);
-    _.forEach(restaurants, (rest) => {
-      if (rest.name === restaurant) {
-        _.forEach(rest.reservations, (res) => {
-          if (res.id === reservation.id) {
-            res.booked = true;
-          }
-        });
-      }
-    });
+    // Commenting out until we update how we handle booked reservations
 
-    this.setState({
-      myReservations,
-      data: restaurants,
-    });
+    // const restaurants = this.state.data.slice(0);
+    // _.forEach(restaurants, (rest) => {
+    //   if (rest.name === restaurant) {
+    //     _.forEach(rest.reservations, (res) => {
+    //       if (res.id === reservation.id) {
+    //         res.booked = true;
+    //       }
+    //     });
+    //   }
+    // });
 
-    axios.post('/book', {
-      reservationId: reservation.id,
-      phoneNumber: this.state.phoneNumber,
-    })
-      .then(() => console.log('we successfully booked a place!'))
-      .catch((err) => {
-        throw err;
-      });
+    // this.setState({
+    //   myReservations,
+    //   data: restaurants
+    // });
+
+    // axios.post('/book', {
+    //   reservationId: reservation.id,
+    //   phoneNumber: this.state.phoneNumber,
+    // })
+    //   .then(() => console.log('we successfully booked a place!'))
+    //   .catch((err) => {
+    //     throw err;
+    //   });
+    
     // update reservation with a phone number
     // add reservation to myReservations
   }
@@ -161,45 +212,61 @@ class App extends React.Component {
       });
   }
 
-  filterData() {
+
+  filterRestaurants() {
     // This function creates the datapoints that populate the various dropdown filters
     // Depends on the dataset coming from server
 
-    const filters = {
-      times: this.state.time,
-      partySizes: this.state.party === 'All' ? 'All' : Number(this.state.party),
-      categories: this.state.category,
-      name: this.state.restaurant,
-    };
+    const { data, time, party, category, restaurant } = this.state;
 
-    let filteredData = this.state.data.slice(0);
 
-    _.forEach(filters, (filter, key) => {
-      if (filter !== 'All' && filter !== '') {
-        filteredData = _.filter(filteredData, restaurant =>
-          restaurant[key].includes(filter));
-      }
+    // let filteredData =  [...data];
+
+    const filteredData = _.filter([...data], (allInfo) => {
+      const restaurantInfo = allInfo[0];
+      const categories = restaurantInfo.categories.map(cat => cat.title);
+      const restaurantName = restaurantInfo.name.toLowerCase().trim();
+
+      return (
+        (category === 'All' || categories.includes(category)) &&
+        (restaurant === '' || restaurantName.includes(restaurant.toLowerCase().trim()))
+      );
     });
+
+    // const filters = {
+    //   times: time,
+    //   // partySizes: (party === 'All') ? 'All' : Number(party),
+    //   categories: category,
+    //   name: restaurant,
+    // };
+
+    // let filteredData =  [...data];
+
+    // _.forEach(filters, (filter, key) => {
+    //   if (filter !== 'All' && filter !== '') {
+    //     filteredData = _.filter(filteredData, restaurant =>
+    //       restaurant[key].includes(filter));
+    //   }
+    // });
     return filteredData;
   }
 
   render() {
+    const { classes } = this.props;
     return (
-      <div>
-        <Search
-          phoneNumber={this.state.phoneNumber}
-          times={this.state.times}
-          partySizes={this.state.partySizes}
-          categories={this.state.categories}
-          onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
-          onCitySubmitClick={this.onCitySubmitClick}
-          onFilterSubmitClick={this.onFilterSubmitClick}
-          onRestaurantSubmitClick={this.onRestaurantSubmitClick}
-          onStateChange={this.onStateChange}
-        />
-        <div className="main">
+      <MuiThemeProvider theme={theme}>
+        <TopMenu />
+          <Search
+            phoneNumber={this.state.phoneNumber}
+            times={this.state.times}
+            categories={this.state.categories}
+            onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
+            onSearchSubmitClick={this.onSearchSubmitClick}
+            onFilterSubmitClick={this.onFilterSubmitClick}
+            onStateChange={this.onStateChange}
+          />
           <AvailableReservations
-            restaurantData={this.filterData()}
+            restaurantData={this.filterRestaurants()}
             onAcceptClick={this.onAcceptClick}
             time={this.state.time}
             party={this.state.party}
@@ -208,10 +275,11 @@ class App extends React.Component {
             reservations={this.state.myReservations}
             onCancelClick={this.onCancelClick}
           />
-        </div>
-      </div>
+      </MuiThemeProvider>
     );
   }
 }
+
+export default withStyles(styles)(App);
 
 ReactDOM.render(<App />, document.getElementById('app'));
