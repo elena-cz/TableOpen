@@ -1,14 +1,30 @@
-.main {
-	display: inline-flex;
+html, body {
+  height: 100%;
+  width: 90%;
+  margin: 0 auto;
 }
 
-.myReservations {
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: 'yellow';
+}
+
+h1 {
+  font-family: 'Roboto Slab', serif;
+}
+
+
+/*.main {
+	height: '100%';
+}*/
+
+/*.myReservations {
 	margin-left: 20px;
 }
 
 .availableReservations {
-
-}
+*/
+/*}*/
 
 ul {
 	list-style-type: none;

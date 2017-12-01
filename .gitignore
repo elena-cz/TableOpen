@@ -35,4 +35,8 @@ client/dist/bundle.js
 
 # Holder for credentials
 config.js
+
 knefile.js
+
+# Package log for JSON
+package-lock.json
