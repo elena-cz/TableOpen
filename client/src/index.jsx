@@ -4,14 +4,13 @@ import axios from 'axios';
 import _ from 'underscore';
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import { withStyles } from 'material-ui/styles';
-import Grid from 'material-ui/Grid';
 import pink from 'material-ui/colors/pink';
 import indigo from 'material-ui/colors/indigo';
 import red from 'material-ui/colors/red';
-import TopMenu from './components/TopMenu.jsx';
-import Search from './components/Search.jsx';
-import AvailableReservations from './components/AvailableReservations.jsx';
-import Myreservations from './components/Myreservations.jsx';
+import TopMenu from './components/TopMenu';
+import Search from './components/Search';
+import AvailableReservations from './components/AvailableReservations';
+import Myreservations from './components/Myreservations';
 
 
 // Global theme
@@ -54,7 +53,7 @@ class App extends React.Component {
       phoneNumber: '',
       restaurant: '',
       time: 'All',
-      party: 'All',
+      party: 2,
       category: 'All',
       selectedRestaurant: [],
     };
@@ -109,23 +108,22 @@ class App extends React.Component {
     // const self = this;
     axios.post('/city', { city })
       .then((results) => {
-        // Populate restaurant data, and available categories 
         const restaurantData = results.data;
-        console.log('restaurantData', restaurantData);
 
-        const allCategories = [];
+        // Get available categories from all restaurants
+        let categories = [];
         restaurantData.forEach((restaurant) => {
-          restaurant[0].categories.forEach(category => allCategories.push(category.title));
+          restaurant[0].categories.forEach(category => categories.push(category.title));
         });
-        const categoryList = _.uniq(['All', ...allCategories]);
+        categories = _.uniq(['All', ...categories]);
 
+        // Save data to state
         this.setState({
           data: restaurantData,
-          categories: categoryList,
+          categories,
         });
-      }).then(() =>{
+      }).then(() => {
         console.log('Data', this.state.data);
-        console.log('categories', this.state.categories);
       })
       .catch((err) => {
         throw err;
@@ -150,7 +148,7 @@ class App extends React.Component {
       // id: reservation.id,
       time: reservationTime,
       party: this.state.party,
-      restaurant: restaurant,
+      restaurant,
     });
 
     // Commenting out until we update how we handle booked reservations
@@ -179,7 +177,7 @@ class App extends React.Component {
     //   .catch((err) => {
     //     throw err;
     //   });
-      
+    
     // update reservation with a phone number
     // add reservation to myReservations
   }
@@ -216,25 +214,23 @@ class App extends React.Component {
 
 
   filterRestaurants() {
-
     // This function creates the datapoints that populate the various dropdown filters
     // Depends on the dataset coming from server
 
-    const { data, time, party, category, restaurant, restaurantData } = this.state
+    const { data, time, party, category, restaurant } = this.state;
 
 
     // let filteredData =  [...data];
 
-    let filteredData = _.filter([...data], allInfo => {
+    const filteredData = _.filter([...data], (allInfo) => {
       const restaurantInfo = allInfo[0];
-      const categories = restaurantInfo.categories.map(category => category.title);
+      const categories = restaurantInfo.categories.map(cat => cat.title);
       const restaurantName = restaurantInfo.name.toLowerCase().trim();
 
       return (
-        (category === 'All' || categories.includes(category)) && 
-        (restaurant === '' || restaurantName.contains(restaurant.toLowerCase().trim()))
+        (category === 'All' || categories.includes(category)) &&
+        (restaurant === '' || restaurantName.includes(restaurant.toLowerCase().trim()))
       );
-
     });
 
     // const filters = {

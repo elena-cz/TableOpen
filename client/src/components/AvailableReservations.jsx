@@ -31,37 +31,36 @@ const AvailableReservations = (props) => {
 
   if (restaurantData.length > 0) {
     return (
-        <Paper className={classes.paper}>
-          <Grid 
-            className={classes.root}
-            container 
-            spacing={24}
-            alignItems="stretch"
-            direction="row"
-            justify="space-between"
-          >
-            {restaurantData.map(restaurant =>
-              (<RestaurantEntry
-                key={restaurant[0].name}
-                restaurantInfo={restaurant}
-                time={time}
-                party={party}
-                onAcceptClick={onAcceptClick}
-              />)) }
-          </Grid>
-        </Paper>
+      <Paper className={classes.paper}>
+        <Grid
+          className={classes.root}
+          container
+          spacing={24}
+          alignItems="stretch"
+          direction="row"
+          justify="space-between"
+        >
+          {restaurantData.map(restaurant =>
+            (<RestaurantEntry
+              key={restaurant[0].name}
+              restaurantInfo={restaurant}
+              time={time}
+              party={party}
+              onAcceptClick={onAcceptClick}
+            />)) }
+        </Grid>
+      </Paper>
     );
   }
 
   return null;
-
-}
+};
 
 export default withStyles(styles)(AvailableReservations);
 
 AvailableReservations.propTypes = {
   time: PropTypes.string.isRequired,
-  party: PropTypes.string.isRequired,
+  party: PropTypes.number.isRequired,
   restaurantData: PropTypes.array.isRequired,
   onAcceptClick: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,

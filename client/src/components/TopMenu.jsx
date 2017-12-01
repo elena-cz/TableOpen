@@ -9,6 +9,7 @@ import Button from 'material-ui/Button';
 const styles = theme => ({
   root: {
     margin: 0,
+    marginTop: theme.spacing.unit,
     marginBottom: theme.spacing.unit * 2,
     width: '100%',
   },

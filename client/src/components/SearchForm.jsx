@@ -28,7 +28,7 @@ const styles = theme => ({
   smallerField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit * 2,
-    width: 80,
+    width: 100,
   },
   selectEmpty: {
     marginTop: theme.spacing.unit * 2,
@@ -44,7 +44,7 @@ class SearchForm extends React.Component {
     this.state = {
       city: '',
       state: '',
-      partyFilter: 'All',
+      partyFilter: 2,
       showFormTip: false,
     };
 
@@ -70,7 +70,7 @@ class SearchForm extends React.Component {
         showFormTip: false,
       });
       e.preventDefault();
-      this.props.onSearchSubmitClick(`${city}, ${state}`, partyFilter);
+      this.props.onSearchSubmitClick(`${city}, ${state}`, partyFilter * 1);
     }
   }
 
@@ -116,6 +116,7 @@ class SearchForm extends React.Component {
 
           <TextField
             id="partyFilter"
+            name="partyFilter"
             select
             label="Party Size"
             className={classes.smallerField}

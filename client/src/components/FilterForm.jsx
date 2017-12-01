@@ -22,7 +22,7 @@ const styles = theme => ({
   smallerField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit * 2,
-    width: 80,
+    width: 100,
   },
   selectEmpty: {
     marginTop: theme.spacing.unit * 2,

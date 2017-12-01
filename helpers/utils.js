@@ -33,7 +33,7 @@ const generatePopularity = (restaurant) => {
     var popularity = 0;
   }
   if (restaurant.review_count > 500 && restaurant.review_count < 750) {
-    var reservationCalculator = newFunction();
+    var reservationCalculator = Math.ceil(Math.random() * 10);
     if (reservationCalculator <= 5) {
       var popularity = 0;
     } else {
