@@ -97,38 +97,31 @@ class App extends React.Component {
     // query db for reservations with this phone number
   }
 
-
-  onSearchSubmitClick(city, party) {
-    console.log(city);
-
-    this.setState({
-      party,
-    });
-
-    // const self = this;
+  onSearchSubmitClick(city, partySize) {
+    console.log(partySize);
+    const self = this;
     axios.post('/city', { city })
       .then((results) => {
-        const restaurantData = results.data;
-
-        // Get available categories from all restaurants
-        let categories = [];
-        restaurantData.forEach((restaurant) => {
-          restaurant[0].categories.forEach(category => categories.push(category.title));
-        });
-        categories = _.uniq(['All', ...categories]);
-
-        // Save data to state
-        this.setState({
-          data: restaurantData,
-          categories,
-        });
-      }).then(() => {
-        console.log('Data', this.state.data);
-      })
-      .catch((err) => {
-        throw err;
+        if (results) {
+          axios.post('/reservations', { city, partySize }).then((restaurants) => {
+            let categories = [];
+            restaurants.data.forEach((restaurant) => {
+              categories.push(restaurant.category);
+            });
+            categories = _.uniq(['All', ...categories]);
+            this.setState({
+              data: restaurants.data,
+              categories,
+              party: partySize,
+            });
+          }).then(() => {
+            console.log('Data', this.state.data);
+          })
+            .catch((err) => {
+              throw err;
+            });
+        }
       });
-    // use api to retrieve new data for the city or restaurant
   }
 
 
@@ -177,7 +170,7 @@ class App extends React.Component {
     //   .catch((err) => {
     //     throw err;
     //   });
-    
+
     // update reservation with a phone number
     // add reservation to myReservations
   }
@@ -217,7 +210,9 @@ class App extends React.Component {
     // This function creates the datapoints that populate the various dropdown filters
     // Depends on the dataset coming from server
 
-    const { data, time, party, category, restaurant } = this.state;
+    const {
+      data, time, party, category, restaurant,
+    } = this.state;
 
 
     // let filteredData =  [...data];
@@ -256,25 +251,25 @@ class App extends React.Component {
     return (
       <MuiThemeProvider theme={theme}>
         <TopMenu />
-          <Search
-            phoneNumber={this.state.phoneNumber}
-            times={this.state.times}
-            categories={this.state.categories}
-            onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
-            onSearchSubmitClick={this.onSearchSubmitClick}
-            onFilterSubmitClick={this.onFilterSubmitClick}
-            onStateChange={this.onStateChange}
-          />
-          <AvailableReservations
-            restaurantData={this.filterRestaurants()}
-            onAcceptClick={this.onAcceptClick}
-            time={this.state.time}
-            party={this.state.party}
-          />
-          <Myreservations
-            reservations={this.state.myReservations}
-            onCancelClick={this.onCancelClick}
-          />
+        <Search
+          phoneNumber={this.state.phoneNumber}
+          times={this.state.times}
+          categories={this.state.categories}
+          onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
+          onSearchSubmitClick={this.onSearchSubmitClick}
+          onFilterSubmitClick={this.onFilterSubmitClick}
+          onStateChange={this.onStateChange}
+        />
+        <AvailableReservations
+          restaurantData={this.filterRestaurants()}
+          onAcceptClick={this.onAcceptClick}
+          time={this.state.time}
+          party={this.state.party}
+        />
+        <Myreservations
+          reservations={this.state.myReservations}
+          onCancelClick={this.onCancelClick}
+        />
       </MuiThemeProvider>
     );
   }

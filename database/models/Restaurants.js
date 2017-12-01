@@ -8,9 +8,8 @@ const Restaurant = bookshelf.Model.extend({
     return this.forge().query({ where: { id } }).fetch();
   },
   reservation() {
-    return this.belongsTo('Reservation');
+    return this.hasMany('Reservation', 'restaurant_id');
   },
 });
-
 
 module.exports = bookshelf.model('Restaurant', Restaurant);

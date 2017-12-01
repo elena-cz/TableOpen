@@ -42,7 +42,7 @@ const AvailableReservations = (props) => {
         >
           {restaurantData.map(restaurant =>
             (<RestaurantEntry
-              key={restaurant[0].name}
+              key={restaurant.name}
               restaurantInfo={restaurant}
               time={time}
               party={party}

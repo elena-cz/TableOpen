@@ -12,6 +12,7 @@ exports.up = (knex, Promise) => Promise.all([
     table.string('image');
     table.integer('review_count');
     table.decimal('rating', 2, 1);
+    table.text('comments', 'longtext');
   }).createTable('customers', (table) => {
     table.increments('id').primary();
     table.string('phone');
@@ -23,6 +24,9 @@ exports.up = (knex, Promise) => Promise.all([
     table.integer('party_size');
     table.string('time');
     table.integer('customer_id').references('customers.id');
+  }).createTable('searched_cities', (table) => {
+    table.increments('id').primary();
+    table.string('city');
   }),
 ]);
 
