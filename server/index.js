@@ -4,14 +4,13 @@ const path = require('path');
 // const twilio = require('../helpers/twilioApi.js');
 const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
 const {
-  generateReservationTimes,
-  seedDatabase,
-  formatCityResults,
-  saveNewCityData,
   queryDatabaseForCity,
+  saveNewCityData,
+  generateReservationTimes,
   getCustomerReservations,
   bookReservation,
   cancelReservation,
+  alreadySearched,
 } = require('../helpers/utils.js');
 
 const PORT = 3000;
@@ -21,38 +20,36 @@ app.use(express.static(path.join(__dirname, '/../client/dist')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// initialize the database with a yelp query for 1000 SF restaurants
-// seedDatabase();
-
-const visitedCities = ['San Francisco, CA'];
-
-
 // Get restaurants and reservations for a particular city
 app.post('/city', (request, response) => {
   // Check whether we have previously queried Yelp for this city
-  if (!visitedCities.includes(request.body.city)) {
-    // If this is a new city: query Yelp for data, store it in DB, send data to client
-    visitedCities.push(request.body.city);
-    getRestaurantsByCity(request.body.city)
-      .then(yelpResults => generateReservationTimes(yelpResults))
-      .then((result) => {
-        response.status(200);
-        response.send(result);
-      });
-  //     .catch((err) => {
-  //       throw err;
-  //     });
-  // } else {
-  //   // We'll skip the Yelp query if this city's data is already in the DB
-  //   queryDatabaseForCity(request.body.city)
-  //     .then(cityResults => response.send(formatCityResults(cityResults)))
-  //     .catch((err) => {
-  //       throw err;
-  //     });
-  // }
-  }
+  // If this is a new city: query Yelp for data, store it in DB, send data to client
+  alreadySearched(request.body.city).then((result) => {
+    if (result === false) {
+      getRestaurantsByCity(request.body.city)
+        .then(yelpResults => saveNewCityData(yelpResults))
+        .then(cityResults => generateReservationTimes(cityResults))
+        .then((result) => {
+          response.status(200);
+          response.send(true);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      response.status(200);
+      response.send(true);
+    }
+  });
 });
 
+app.post('/reservations', (req, res) => {
+  queryDatabaseForCity('Berkeley', req.body.partySize).then((data) => {
+    console.log('here is the data', data);
+    res.status(200);
+    res.send(JSON.stringify(data));
+  });
+});
 
 app.post('/book', (request, response) => {
   bookReservation(request.body.reservationId, request.body.phoneNumber)

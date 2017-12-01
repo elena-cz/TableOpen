@@ -62,20 +62,18 @@ class App extends React.Component {
     // query db for reservations with this phone number
   }
 
-  onCitySubmitClick(city) {
+  onCitySubmitClick(city, partySize) {
     const self = this;
     axios.post('/city', { city })
       .then((results) => {
-        self.setState({
-          data: results.data,
-        });
-      }).then(() =>{
-        console.log(self.state.data);
-      })
-      .catch((err) => {
-        throw err;
+        console.log(results);
+        if (results) {
+          axios.post('/reservations', { partySize: 8 }).then((data) => {
+            console.log('howdy', data.data);
+          });
+        }
+        // use api to retrieve new data for the city or restaurant
       });
-    // use api to retrieve new data for the city or restaurant
   }
 
   onRestaurantSubmitClick(restaurant) {

@@ -2,8 +2,8 @@ const knex = require('knex')({
   client: 'postgres',
   connection: {
     host: '127.0.0.1',
-    user: '',
-    password: '',
+    user: 'luisalvarez',
+    password: 'scooby225',
     database: 'tableopen',
   },
 });
