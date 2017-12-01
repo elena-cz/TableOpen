@@ -11,6 +11,7 @@ import TopMenu from './components/TopMenu';
 import Search from './components/Search';
 import AvailableReservations from './components/AvailableReservations';
 import Myreservations from './components/Myreservations';
+import OwnerFloorPlan from './components/OwnerFloorPlan';
 
 
 // Global theme
@@ -251,25 +252,26 @@ class App extends React.Component {
     return (
       <MuiThemeProvider theme={theme}>
         <TopMenu />
-        <Search
-          phoneNumber={this.state.phoneNumber}
-          times={this.state.times}
-          categories={this.state.categories}
-          onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
-          onSearchSubmitClick={this.onSearchSubmitClick}
-          onFilterSubmitClick={this.onFilterSubmitClick}
-          onStateChange={this.onStateChange}
-        />
-        <AvailableReservations
-          restaurantData={this.filterRestaurants()}
-          onAcceptClick={this.onAcceptClick}
-          time={this.state.time}
-          party={this.state.party}
-        />
-        <Myreservations
-          reservations={this.state.myReservations}
-          onCancelClick={this.onCancelClick}
-        />
+          <Search
+            phoneNumber={this.state.phoneNumber}
+            times={this.state.times}
+            categories={this.state.categories}
+            onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
+            onSearchSubmitClick={this.onSearchSubmitClick}
+            onFilterSubmitClick={this.onFilterSubmitClick}
+            onStateChange={this.onStateChange}
+          />
+          <AvailableReservations
+            restaurantData={this.filterRestaurants()}
+            onAcceptClick={this.onAcceptClick}
+            time={this.state.time}
+            party={this.state.party}
+          />
+          <Myreservations
+            reservations={this.state.myReservations}
+            onCancelClick={this.onCancelClick}
+          />
+          <OwnerFloorPlan />
       </MuiThemeProvider>
     );
   }
