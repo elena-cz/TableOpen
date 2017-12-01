@@ -7,7 +7,12 @@ const client = new postgres.Client({
   // ssl: true
 });
 
-client.connect();
+client.connect(function(err) {
+  if (err) {
+    console.error('error connecting: ' + err.stack);
+    return;
+  }
+});
 
 // create schema for restaurants
 client.query('DROP TABLE restaurants');
@@ -42,7 +47,11 @@ client.query('DROP TABLE customers');
 client.query(`
   CREATE TABLE IF NOT EXISTS customers (
   id SERIAL PRIMARY KEY,
-  phone VARCHAR(255))`);
+  email VARCHAR(255),
+  name VARCHAR(255),
+  password VARCHAR(255),
+  user_type VARCHAR(255),
+  facebook_id VARCHAR(255))`);
 
 module.exports = {
   client,
