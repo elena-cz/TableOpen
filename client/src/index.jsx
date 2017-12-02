@@ -105,14 +105,14 @@ class App extends React.Component {
       .then((results) => {
         if (results) {
           axios.post('/reservations', { city, partySize }).then((restaurants) => {
-            let categories = [];
-            restaurants.data.forEach((restaurant) => {
-              categories.push(restaurant.category);
-            });
-            categories = _.uniq(['All', ...categories]);
+            // let categories = [];
+            // restaurants.data.forEach((restaurant) => {
+            //   categories.push(restaurant.category);
+            // });
+            // categories = _.uniq(['All', ...categories]);
             this.setState({
               data: restaurants.data,
-              categories,
+              // categories,
               party: partySize,
             });
           }).then(() => {
@@ -220,11 +220,11 @@ class App extends React.Component {
 
     const filteredData = _.filter([...data], (allInfo) => {
       const restaurantInfo = allInfo[0];
-      const categories = restaurantInfo.categories.map(cat => cat.title);
+      // const categories = restaurantInfo.categories.map(cat => cat.title);
       const restaurantName = restaurantInfo.name.toLowerCase().trim();
 
       return (
-        (category === 'All' || categories.includes(category)) &&
+        // (category === 'All' || categories.includes(category)) &&
         (restaurant === '' || restaurantName.includes(restaurant.toLowerCase().trim()))
       );
     });

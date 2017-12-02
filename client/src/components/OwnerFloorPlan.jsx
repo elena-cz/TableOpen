@@ -2,10 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Button from 'material-ui/Button';
-import { generateTables } from '../clientHelpers/ownerHelpers';
+import Typography from 'material-ui/Typography';
+import Grid from 'material-ui/Grid';
+import Paper from 'material-ui/Paper';
+import { generateMatrix, generateTables } from '../clientHelpers/ownerHelpers';
 
 
 const styles = theme => ({
+  root: {
+    marginBottom: theme.spacing.unit * 3,
+  },
+  paper: {
+    marginTop: 30,
+    padding: 16,
+    color: theme.palette.text.primary,
+  },
   grid: {
     flexGrow: 1,
     display: 'grid',
@@ -29,6 +40,15 @@ const styles = theme => ({
     boxSizing: 'border-box',
     background: '#AD1457',
   },
+  button: {
+    margin: 10,
+    float: 'right',
+  },
+  exampleSquare: {
+    background: '#AD1457',
+    height: 50,
+    width: 50,
+  },
 });
 
 
@@ -45,7 +65,7 @@ class OwnerFloorPlan extends React.Component {
   }
 
   componentDidMount = () => {
-    const newMatrix = this.createMatrix();
+    const newMatrix = generateMatrix(10, 10);
     this.setState({
       matrix: newMatrix,
     });
@@ -81,7 +101,7 @@ class OwnerFloorPlan extends React.Component {
   onSquareClick = (coordinates) => {
     const [row, col] = coordinates;
     const newMatrix = [...this.state.matrix];
-    newMatrix[row][col] = (newMatrix[row][col]) ? 0 : 1;
+    newMatrix[row][col] = !newMatrix[row][col];
     this.setState({
       matrix: newMatrix,
     });
@@ -93,31 +113,58 @@ class OwnerFloorPlan extends React.Component {
     this.setState({
       tables,
     });
+    this.props.toggleEditMode();
     console.log(JSON.stringify(tables));
   }
-
-  createMatrix = () => {
-    const { numRows, numCols } = this.state;
-    const row = Array(numCols).fill(0);
-    const matrix = row.map(() => [...row]);
-    return matrix;
-  }
+ 
 
   render() {
     const { classes } = this.props; 
     return (
-      <div>
-        <div className={this.props.classes.grid} >
-        { this.squares() }
-        </div>
-        <Button
-          type="null"
-          raised
-          color="accent"
-          className={classes.button}
-          onClick={e => this.onSaveClick(e)} >
-          Save
-        </Button>
+      <div className={classes.root}>
+        <Paper className={classes.paper} >
+          <Grid container spacing={24}>
+            <Grid item xs={12} >
+            <Typography type="headline" gutterBottom>
+              Edit Floor Plan
+            </Typography>
+            </Grid>
+            <Grid item xs>
+              <Grid container spacing={16} >
+                <Grid item xs={3} >
+                  <div className={classes.exampleSquare} />
+                </Grid>
+                <Grid item xs={9} >
+                  <Typography type="body1" gutterBottom align="left">
+                    Each square is equal to 2 seats
+                  </Typography>
+                </Grid>
+                <Grid item xs={3} >
+                  <div className={classes.exampleSquare} />
+                  <div className={classes.exampleSquare} />
+                </Grid>
+                <Grid item xs={9} >
+                  <Typography type="body1" gutterBottom align="left">
+                    Create bigger tables by putting squares next to each other
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs>
+              <div className={classes.grid} >
+              { this.squares() }
+              </div>
+              <Button
+                type="null"
+                raised
+                color="accent"
+                className={classes.button}
+                onClick={e => this.onSaveClick(e)} >
+                Save
+              </Button>
+          </Grid>
+          </Grid>
+        </Paper>
       </div>
     );
   }
