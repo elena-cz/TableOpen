@@ -9,6 +9,7 @@ import pink from 'material-ui/colors/pink';
 import indigo from 'material-ui/colors/indigo';
 import red from 'material-ui/colors/red';
 
+
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Search from './components/Search.jsx';
 import AvailableReservations from './components/AvailableReservations.jsx';
@@ -53,5 +54,7 @@ class App extends React.Component {
     )
   }
 }
+
+export default App;
 
 ReactDOM.render(<App />, document.getElementById('app'));

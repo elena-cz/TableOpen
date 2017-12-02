@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import _ from 'underscore';
+
 import { withStyles } from 'material-ui/styles';
 import { Switch, Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 import Search from './Search.jsx';
@@ -112,6 +113,7 @@ class Home extends React.Component {
     this.setState({ [e.target.name]: e.target.value });
   }
 
+
   onSearchSubmitClick(city, partySize) {
     console.log(partySize);
     const self = this;
@@ -140,7 +142,6 @@ class Home extends React.Component {
   }
 
   onPhoneNumberSubmitClick(phoneNumber) {
-    // console.log(phoneNumber, typeof phoneNumber);
     const self = this;
     axios.post('/user', { phoneNumber })
       .then((userReservations) => {
@@ -166,28 +167,6 @@ class Home extends React.Component {
     // query db for reservations with this phone number
   }
 
-  onCitySubmitClick(city) {
-    console.log(city);
-    const self = this;
-    axios.post('/city', { city })
-      .then((results) => {
-        self.setState({
-          data: results.data
-        });
-      })
-      .catch((err) => {
-        throw err;
-      });
-
-    // use api to retrieve new data for the city or restaurant
-  }
-
-  onRestaurantSubmitClick(restaurant) {
-    this.setState({
-      restaurant
-    });
-  }
-
   onFilterSubmitClick(time, party, category) {
     // filter avaiable restaurants
     this.setState({
@@ -196,7 +175,6 @@ class Home extends React.Component {
       category,
     });
   }
-
 
   onAcceptClick(reservationTime, restaurant) {
     // send data to db and repopulate my reservation list
@@ -234,9 +212,6 @@ class Home extends React.Component {
     //   .catch((err) => {
     //     throw err;
     //   });
-
-    // update reservation with a phone number
-    // add reservation to myReservations
   }
 
   onCancelClick(index, reservation) {
