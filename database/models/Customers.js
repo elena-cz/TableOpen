@@ -6,6 +6,9 @@ const Customer = bookshelf.Model.extend({
   byId(id) {
     return this.forge().query({ where: { id } }).fetch();
   },
+  byFBID(id) {
+    return this.forge().query({ where: { 'facebook_id': id } }).fetch();
+  },
   reservation() {
     return this.belongsTo('Reservation');
   },

@@ -2,7 +2,14 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-const { client } = require('../database/index.js');
+const { 
+  grabCustomerByFbId,
+  addFbCustomerToDataBase,
+  updateFbUserType,
+  addCustomerToDataBase,
+  grabCustomerById,
+} = require('../database/helpers.js');
+// const { client } = require('../database/index.js');
 // const twilio = require('../helpers/twilioApi.js');
 const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
 const {
@@ -107,6 +114,10 @@ app.get('/home', (req, res) => {
   res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
 });
 
+app.get('/error', (req, res) => {
+  res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
+});
+
 app.get('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
 });
@@ -125,29 +136,22 @@ passport.use(new FacebookStrategy({
     currUserProfile = profile.photos[0].value;
     currEmail = profile._json.email;
     currFriends = profile._json.friends;
-    client.query(`SELECT * FROM customers WHERE facebook_id = '${profile.id}';`, function(err, user) {
-      if (err) {
-          return done(err);
-      }
-      //If no user is found, create a new user with values from Facebook
-      if (user.rowCount === 0) {
-        client.query(`INSERT INTO customers (email, name, user_type, facebook_id) VALUES ('${profile._json.email}', '${profile.displayName}', '${currType}', '${profile.id}');`, function(err, data) {
-          done(null, user);
-          if (err) {
-            console.log('error entering customer into database');
-            return done(err);
-          }
-        });
-      } else {
-        client.query(`UPDATE customers SET user_type = '${currType}');`, function(err, data) {
-          if(err) {
-            console.log('error updating records');
-          }
-          console.log(data);
-        });
-      done(null, user);
-    }
-    });
+    grabCustomerByFbId(profile.id)
+      .then(user => {
+        console.log('Results', user.toJSON());
+        if(!user) {
+          addFbCustomerToDataBase(profile._json.email, profile.displayName, currType, profile.id)
+            .then(user => done(null, user))
+            .catch(err => done(err));
+        } else {
+          updateFbUserType(profile.id, currType)
+            .then(user => done(null, user))
+            .catch(err => done(err));
+        }
+      })
+      .catch(err => {
+        return done(err);
+      });
   })
 );
 
@@ -177,17 +181,19 @@ passport.deserializeUser(function(user, done) {
 //Passport local strategy
 passport.use('local', new Strategy(
   function(username, password, done) {
-   currUserName = username;
-   client.query(`SELECT * FROM customers WHERE email = '${username}' AND password = '${password}';`, (err, user) => {if (err) {
-          return done(err);
-        }
-      if(user.rowCount === 0) {
+   grabCustomerById(username, password)
+    .then( user => {
+      if(!user) {
         return done(null, false);
       } else {
+        currUserName = user.attributes.name;
         return done(null, user);
       }
-    }
-)}));
+    })
+    .catch(err => {
+      return done(err);
+    });
+}));
 
 passport.use('local-signup', new Strategy({
     passReqToCallback: true,
@@ -195,13 +201,13 @@ passport.use('local-signup', new Strategy({
   },
   function(req, username, password, done) {
     currUserName = req.body.name;
-    client.query(`INSERT INTO customers (email, name, password, user_type) VALUES ('${username}', '${req.body.name}', '${password}', '${req.body.usertype[0]}');`, function(err, user) {
-        if (err) {
-          console.log('error entering customer into database');
-          return done(err);
-        }
-        return done(null, user);
-      });
+    addCustomerToDataBase(username, req.body.name, password, req.body.usertype[0])
+    .then(user => {
+      return done(null, user);
+    })
+    .catch(err => {
+      return done(err);
+    })
  }));
 
 app.post('/newuser', urlencodedParser, 
@@ -209,7 +215,7 @@ app.post('/newuser', urlencodedParser,
 );
 
 app.post('/loginpassport', urlencodedParser, passport.authenticate('local',
-  { successRedirect: '/home', failureRedirect: '/' })
+  { successRedirect: '/home', failureRedirect: '/error' })
 );
 
 //responds to logout request

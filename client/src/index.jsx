@@ -18,6 +18,7 @@ import LoginPage from './components/LoginPage.jsx';
 import Home from './components/Home.jsx';
 import SignUp from './components/SignUp.jsx';
 import TopMenu from './components/TopMenu';
+import LoginError from './components/Error.jsx';
 // Global theme
 
 const theme = createMuiTheme({
@@ -48,6 +49,7 @@ class App extends React.Component {
         <Route exact path='/' component={LoginPage} />
         <Route path='/home' component={Home}/>
         <Route path='/signup' component={SignUp}/>
+        <Route path='/error' component={LoginError}/>
       </div>
       </Router>
      </MuiThemeProvider>
