@@ -85,6 +85,15 @@ app.post('/reservations', (req, res) => {
   if (city.length > 1) {
     var formattedCity = `${city[0]} ${city[1].slice(0, 1).toUpperCase() + city[1].slice(1, city[1].length)}`;
     console.log(formattedCity);
+  } else {
+    var formattedCity = city.join(' ');
+    console.log(formattedCity);    
+  }
+  queryDatabaseForCity(formattedCity, req.body.partySize).then((data) => {
+    res.status(200);
+    res.send(JSON.stringify(data));
+  });
+});
 
 //helper function that checks if user is authenticated
 const authenticated =  (req, res, next) =>{
@@ -212,9 +221,9 @@ app.get('/logout', function(req, res) {
 });
 
 // initialize the database with a yelp query for 1000 SF restaurants
-seedDatabase();
+// seedDatabase();
 
-const visitedCities = ['San Francisco, CA'];
+// const visitedCities = ['San Francisco, CA'];
 
 // App will initially load with SF as the default city
 app.get('/data', (request, response) => {

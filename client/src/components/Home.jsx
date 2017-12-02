@@ -2,14 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import _ from 'underscore';
+import { withStyles } from 'material-ui/styles';
 import { Switch, Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 import Search from './Search.jsx';
 import AvailableReservations from './AvailableReservations.jsx';
 import Myreservations from './Myreservations.jsx';
-import TopMenu from './components/TopMenu';
-import Search from './components/Search';
-import AvailableReservations from './components/AvailableReservations';
-import Myreservations from './components/Myreservations';
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    width: '100%',
+    height: '100%',
+  },
+});
 
 class Home extends React.Component {
   constructor(props) {
@@ -42,7 +47,6 @@ class Home extends React.Component {
   componentDidMount() {
     axios.get('/facebookData')
       .then((results) => {
-        console.log('RESULTS', results.data.currUserName);
         this.setState({
           currUserName: results.data.currUserName,
           currUserProfile: results.data.currUserProfile,

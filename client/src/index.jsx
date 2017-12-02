@@ -16,7 +16,7 @@ import Myreservations from './components/Myreservations.jsx';
 import LoginPage from './components/LoginPage.jsx';
 import Home from './components/Home.jsx';
 import SignUp from './components/SignUp.jsx';
-
+import TopMenu from './components/TopMenu';
 // Global theme
 
 const theme = createMuiTheme({
@@ -31,14 +31,6 @@ const theme = createMuiTheme({
       A700: '#304ffe',
     },
     error: red,
-  },
-});
-
-const styles = theme => ({
-  root: {
-    flexGrow: 1,
-    width: '100%',
-    height: '100%',
   },
 });
 
