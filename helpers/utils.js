@@ -1,15 +1,10 @@
 const _ = require('underscore');
 const moment = require('moment');
-const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
-const { client } = require('../database/index.js');
 const { sendConfirmationText, sendCancellationText } = require('../helpers/twilioApi.js');
 const db = require('../database/helpers.js');
-const bookshelf = require('../database/index').bookshelf;
 const Promise = require('bluebird');
-const Reservation = require('../database/models/Reservations');
 const Restaurant = require('../database/models/Restaurants');
 const SearchedCity = require('../database/models/SearchedCities');
-
 
 const alreadySearched = city => SearchedCity.query({
   where: {
@@ -18,36 +13,22 @@ const alreadySearched = city => SearchedCity.query({
 }).fetchAll()
   .then((results) => {
     if (results.length === 0) {
-      return db.addCityToDatabase(city).then((result) => false);
+      return db.addCityToDatabase(city).then(result => false);
     }
     return true;
   });
 
 const generatePopularity = (restaurant) => {
-  if (restaurant.review_count < 500) {
-    var popularity = 1;
+  if (restaurant.review_count < 300) {
+    const reservationCalculator = Math.floor(Math.random() * 5) + 1;
+    return reservationCalculator;
   }
-  if (restaurant.review_count > 500 && restaurant.review_count < 750) {
-    var reservationCalculator = Math.ceil(Math.random() * 10);
-    if (reservationCalculator <= 5) {
-      var popularity = 2;
-    } else {
-      var popularity = 3;
-    }
-  }
-  if (restaurant.review_count > 750) {
-    var reservationCalculator = Math.ceil(Math.random() * 10);
-    if (reservationCalculator <= 8) {
-      var popularity = 4;
-    } else {
-      var popularity = 5;
-    }
-  }
-  return popularity;
+  const reservationCalculator = Math.floor(Math.random() * 7) + 1;
+  return reservationCalculator;
 };
 
 const isBooked = (popularity) => {
-  if (popularity < 3) {
+  if (popularity === 1) {
     return false;
   }
   return true;
@@ -76,10 +57,10 @@ const generateReservationTimes = (data) => {
       for (let h = 0; h < 6; h++) {
         let popularity = generatePopularity(restaurant.attributes);
         let isReservationBooked = isBooked(popularity);
-        promise.push(db.addReservationToDatabase(restaurant.id, isReservationBooked, 4, null, `${j}:00`));
+        promise.push(db.addReservationToDatabase(restaurant.id, isReservationBooked, 6, null, `${j}:00`));
         popularity = generatePopularity(restaurant.attributes);
         isReservationBooked = isBooked(popularity);
-        promise.push(db.addReservationToDatabase(restaurant.id, isReservationBooked, 4, null, `${j}:30`));
+        promise.push(db.addReservationToDatabase(restaurant.id, isReservationBooked, 6, null, `${j}:30`));
       }
       for (let l = 0; l < 4; l++) {
         let popularity = generatePopularity(restaurant.attributes);
@@ -97,43 +78,19 @@ const generateReservationTimes = (data) => {
 // (name, category, address, city, state, zip, phone, url, image, review_count, rating)
 const saveNewCityData = data => Promise.map(data.businesses, restaurant => db.addRestaurantToDataBase(restaurant.name, restaurant.categories[0].title, `${restaurant.location.address1} ${restaurant.location.address2} ${restaurant.location.address3}`, restaurant.location.city, restaurant.location.state, restaurant.location.zip_code, restaurant.display_phone, restaurant.url, restaurant.image_url, restaurant.review_count, restaurant.rating, '')).then(res => res);
 
-
-// const formatCityResults = (cityResults) => {
-//   const restaurants = {};
-//   return Promise.map(cityResults, (rest) => {
-//     restaurants[rest.attributes.name] = {
-//       name: rest.attributes.name,
-//       image_url: rest.attributes.image,
-//       category: rest.attributes.category,
-//     };
-//   }).then(() => {
-//     const data = _.map(restaurants, (item) => {
-//       const output = {
-//         name: item.name,
-//         image_url: item.image_url,
-//         categories: [item.category],
-//         reservations: item.reservations,
-//       };
-//       return output;
-//     });
-//     return data;
-//   }).then((data) => data);
-// };
-
-
 const queryDatabaseForCity = (city, party_size) => new Promise((resolve, reject) => {
   Restaurant.query({
     where: {
       city,
     },
-  }).fetchAll({ withRelated: ['reservation'] }).then((data) => data).then((results) => {
+  }).fetchAll({ withRelated: ['reservation'] }).then(data => data).then((results) => {
     resolve(results);
   });
 }).then((reservations) => {
   const restaurants = [];
   return Promise.map(reservations.models, (item) => {
     const limit = {};
-    let arrayHolder = [];
+    const arrayHolder = [];
     for (let i = 0; i < item.relations.reservation.models.length; i++) {
       if (item.relations.reservation.models[i].attributes.isReservationBooked === false && item.relations.reservation.models[i].attributes.party_size === party_size && limit[`${item.relations.reservation.models[i].attributes.party_size}${item.relations.reservation.models[i].attributes.time}`] !== true) {
         arrayHolder.push(item.relations.reservation.models[i].attributes);
@@ -142,11 +99,15 @@ const queryDatabaseForCity = (city, party_size) => new Promise((resolve, reject)
     }
     item.attributes.reservations = arrayHolder;
     restaurants.push(item.attributes);
-  }).then(() => {
-    return restaurants;
-  });
+  }).then(() => restaurants);
 });
 
+module.exports = {
+  generateReservationTimes,
+  saveNewCityData,
+  queryDatabaseForCity,
+  alreadySearched,
+};
 
 // const getCustomerReservations = (phoneNumber = '555-867-5309') => new Promise((resolve, reject) => {
 //   Promise.resolve(client.query(
@@ -165,7 +126,6 @@ const queryDatabaseForCity = (city, party_size) => new Promise((resolve, reject)
 //       reject(err);
 //     });
 // });
-
 
 // const bookReservation = (reservationId, phoneNumber = '555-867-5309') => new Promise((resolve, reject) => {
 //   Promise.resolve(client.query(
@@ -217,7 +177,6 @@ const queryDatabaseForCity = (city, party_size) => new Promise((resolve, reject)
 //     .catch(err => reject(err));
 // });
 
-
 // const cancelReservation = reservationId => new Promise((resolve, reject) => {
 //   Promise.resolve(client.query(
 //     `UPDATE reservations
@@ -233,14 +192,3 @@ const queryDatabaseForCity = (city, party_size) => new Promise((resolve, reject)
 //     .catch(err => reject(err));
 // });
 
-
-module.exports = {
-  generateReservationTimes,
-  // formatCityResults,
-  saveNewCityData,
-  queryDatabaseForCity,
-  alreadySearched,
-  // getCustomerReservations,
-  // bookReservation,
-  // cancelReservation,
-};

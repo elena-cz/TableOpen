@@ -15,15 +15,15 @@ const styles = theme => ({
 });
 
 const ReservationEntry = (props) => {
-  const { reservationTime, restaurant, accept, classes } = props;
+  const { reservationTime, restaurant, accept, classes, reservation } = props;
 
   return (
     <Button
-      key={reservationTime}
+      key={reservation.id}
       raised
       color="primary"
       className={classes.button}
-      onClick={() => accept(reservationTime, restaurant)}
+      onClick={() => accept(reservation, restaurant)}
     >
       {reservationTime}
     </Button>

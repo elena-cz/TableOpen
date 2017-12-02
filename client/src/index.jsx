@@ -11,8 +11,8 @@ import TopMenu from './components/TopMenu';
 import Search from './components/Search';
 import AvailableReservations from './components/AvailableReservations';
 import Myreservations from './components/Myreservations';
-
-
+import Loader from './components/Refresh';
+import Confirmation from './components/ConfirmationPage';
 // Global theme
 
 const theme = createMuiTheme({
@@ -56,6 +56,8 @@ class App extends React.Component {
       party: 2,
       category: 'All',
       selectedRestaurant: [],
+      isLoading: false,
+      reservation: [],
     };
     this.onAcceptClick = this.onAcceptClick.bind(this);
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
@@ -99,6 +101,7 @@ class App extends React.Component {
 
   onSearchSubmitClick(city, partySize) {
     console.log(partySize);
+    this.setState({ isLoading: true });
     const self = this;
     axios.post('/city', { city })
       .then((results) => {
@@ -115,6 +118,7 @@ class App extends React.Component {
               party: partySize,
             });
           }).then(() => {
+            this.setState({ isLoading: false });
             console.log('Data', this.state.data);
           })
             .catch((err) => {
@@ -134,14 +138,10 @@ class App extends React.Component {
     });
   }
 
-  onAcceptClick(reservationTime, restaurant) {
-    // send data to db and repopulate my reservation list
-    const myReservations = this.state.myReservations.slice(0);
-    myReservations.push({
-      // id: reservation.id,
-      time: reservationTime,
-      party: this.state.party,
-      restaurant,
+  onAcceptClick(res, rest) {
+    this.setState({
+      reservation: res,
+      restaurant: rest,
     });
 
     // Commenting out until we update how we handle booked reservations
@@ -218,13 +218,13 @@ class App extends React.Component {
     // let filteredData =  [...data];
 
     const filteredData = _.filter([...data], (allInfo) => {
-      const restaurantInfo = allInfo[0];
-      const categories = restaurantInfo.categories.map(cat => cat.title);
+      const restaurantInfo = allInfo;
+      const categories = restaurantInfo.category;
       const restaurantName = restaurantInfo.name.toLowerCase().trim();
 
       return (
-        (category === 'All' || categories.includes(category)) &&
-        (restaurant === '' || restaurantName.includes(restaurant.toLowerCase().trim()))
+        (category === 'All' || categories === category &&
+        (restaurant === '' || restaurantName.includes(restaurant.toLowerCase().trim())))
       );
     });
 
@@ -248,6 +248,22 @@ class App extends React.Component {
 
   render() {
     const { classes } = this.props;
+    if (this.state.isLoading) {
+      return (
+        <MuiThemeProvider theme={theme}>
+        <TopMenu />
+        <Loader />
+      </MuiThemeProvider>
+      );
+    }
+    if (this.state.restaurant.length !== 0) {
+      return ( 
+      <MuiThemeProvider theme={theme}>
+      <TopMenu />
+      <Confirmation reservation = {this.state.reservation} restaurant={this.state.restaurant} />
+      </MuiThemeProvider>
+      );
+    }
     return (
       <MuiThemeProvider theme={theme}>
         <TopMenu />

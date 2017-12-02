@@ -11,5 +11,4 @@ const Customer = bookshelf.Model.extend({
   },
 });
 
-
 module.exports = bookshelf.model('Customer', Customer);

@@ -1,7 +1,6 @@
 const bookshelf = require('../index').bookshelf;
 const Reservation = require('./Reservations');
 
-
 const Restaurant = bookshelf.Model.extend({
   tableName: 'restaurants',
   byId(id) {

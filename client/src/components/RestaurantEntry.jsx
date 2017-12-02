@@ -30,36 +30,36 @@ const RestaurantEntry = (props) => {
 
   const { restaurantInfo, time, party, onAcceptClick, classes } = props;
 
-  const restaurant = restaurantInfo[0];
-  const reservationTimesForParty = [];
-  restaurantInfo[1].forEach((reservation) => {
-    if (reservation[1] === party) {
-      reservationTimesForParty.push(reservation[0]);
-    }
+  const restaurant = restaurantInfo;
+  const reservationTimesForParty = restaurantInfo.reservations;
+  reservationTimesForParty.sort((a, b) => {
+    var x = a.time.replace(/[^a-zA-Z0-9-_]/g, '');
+    var y = b.time.replace(/[^a-zA-Z0-9-_]/g, '');
+    return x - y;
   });
-
   if (reservationTimesForParty.length > 0) {
     return (
       <Grid item xs={12} >
         <Grid container>
           <Grid item xs={4} >
-            <img src={restaurant.image_url} alt="pic of restaurant" className={classes.image} />
+            <img src={restaurant.image} alt="pic of restaurant" className={classes.image} />
           </Grid>
           <Grid item xs={8} className={classes.restaurantInfo}>
-            <Typography type="title" gutterBottom>{restaurant.name}</Typography>
+            <Typography type="title" gutterBottom><a href={restaurant.url} target="_blank" >{restaurant.name}</a></Typography>
             <Typography type="body1">
-              {restaurant.location.address1}, {restaurant.location.address2}
+              {restaurant.address}
               <br />
-              {restaurant.display_phone}
+              {restaurant.phone}
             </Typography>
 
             {reservationTimesForParty.map(resTime =>
               (
                 <ReservationEntry
-                  key={resTime}
+                  key={resTime.time}
                   restaurant={restaurant.name}
-                  reservationTime={resTime}
+                  reservationTime={resTime.time}
                   accept={onAcceptClick}
+                  reservation={resTime}
                 />
             ))}
           </Grid>

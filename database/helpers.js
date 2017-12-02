@@ -8,7 +8,6 @@ const addCustomerToDataBase = (name, phone) => {
   const customer = new db.Customer();
   customer.set('name', name);
   customer.set('phone', phone);
-
   customer.save().then(user => user);
 };
 
