@@ -58,13 +58,31 @@ export const generateTables = (inputMatrix) => {
   return tables;
 };
 
+// const tables = [
+//       {
+//         size: 2,
+//         coordinates: [[0, 3]],
+//         booked: true,
+//       },
+//       {
+//         size: 8,
+//         coordinates: [[1, 5], [1, 6], [1, 7], [2, 7]],
+//         booked: false,
+//       },
+//       {
+//         size: 4,
+//         coordinates: [[2, 1], [3, 1]],
+//         booked: true,
+//       },
+//     ];
 
-export const getMatrixFromCoordinates = (tables) => {
-  const matrix = generateMatrix(10, 10);
+
+export const getMatrixFromCoordinates = (tables, numRows, numCols) => {
+  const matrix = generateMatrix(numRows, numCols);
   tables.forEach((table) => {
     table.coordinates.forEach((coordinate) => {
       const [row, col] = coordinate;
-      matrix[row][col] = 1;
+      matrix[row][col] = (table.booked) ? 2 : 1;
     });
   });
   return matrix;

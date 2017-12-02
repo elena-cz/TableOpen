@@ -32,7 +32,8 @@ const styles = theme => ({
     border: '1px solid #eeeeee',
     boxSizing: 'border-box',
     '&:hover': {
-      background: 'rgba(173, 20, 87, 0.25)',
+      background: '#e7c9d5',
+      border: '1px solid #e7c9d5',
     },
   },
   selectedSquare: {
