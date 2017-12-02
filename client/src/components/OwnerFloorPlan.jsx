@@ -1,18 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import Paper from 'material-ui/Paper';
-import Grid from 'material-ui/Grid';
 import Button from 'material-ui/Button';
 import { generateTables } from '../clientHelpers/ownerHelpers';
 
 
 const styles = theme => ({
-  paper: {
-    marginTop: 30,
-    padding: 16,
-    color: theme.palette.text.primary,
-  },
   grid: {
     flexGrow: 1,
     display: 'grid',
@@ -100,6 +93,7 @@ class OwnerFloorPlan extends React.Component {
     this.setState({
       tables,
     });
+    console.log(JSON.stringify(tables));
   }
 
   createMatrix = () => {
@@ -110,15 +104,21 @@ class OwnerFloorPlan extends React.Component {
   }
 
   render() {
+    const { classes } = this.props; 
     return (
-      <Paper className={this.props.classes.paper} >
+      <div>
         <div className={this.props.classes.grid} >
         { this.squares() }
         </div>
-        <Button type="null" raised color="accent" onClick={e => this.onSaveClick(e)} >
+        <Button
+          type="null"
+          raised
+          color="accent"
+          className={classes.button}
+          onClick={e => this.onSaveClick(e)} >
           Save
         </Button>
-      </Paper>
+      </div>
     );
   }
 }

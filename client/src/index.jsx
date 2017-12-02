@@ -11,7 +11,7 @@ import TopMenu from './components/TopMenu';
 import Search from './components/Search';
 import AvailableReservations from './components/AvailableReservations';
 import Myreservations from './components/Myreservations';
-import OwnerFloorPlan from './components/OwnerFloorPlan';
+import OwnerPortal from './components/OwnerPortal';
 
 
 // Global theme
@@ -271,7 +271,7 @@ class App extends React.Component {
             reservations={this.state.myReservations}
             onCancelClick={this.onCancelClick}
           />
-          <OwnerFloorPlan />
+          <OwnerPortal />
       </MuiThemeProvider>
     );
   }
