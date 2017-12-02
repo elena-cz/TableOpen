@@ -5,13 +5,10 @@ export default class SignUp extends React.Component{
 
   constructor(props) {
   	super(props);
-  	this.state = {
-      type: '',
-  	};
   }
 
   handleFBChange(event) {
-	axios.post('/typeof', {type: event.target.value})
+	 axios.post('/typeof', {type: event.target.value})
       .then((results) => {
       	console.log('sent to server typeof FB user')
       })
@@ -39,7 +36,7 @@ export default class SignUp extends React.Component{
       <select name="usertype"> 
 	    <option value="customer">Customer</option>
 	    <option value="restaurant">Restaurant Manager</option>
-	  </select>
+	    </select>
 	  <br></br>
 	  <input type="submit" value="Submit" />
 	  <br></br>
@@ -47,10 +44,10 @@ export default class SignUp extends React.Component{
 	  <a href="/auth/facebook"> Sign up with Facebook</a>
 	  <br></br>
       Type of User:
-      <select name="usertype" value={this.state.type} onChange={this.handleFBChange}> 
+      <select name="usertype" onChange={this.handleFBChange}>
 	    <option value="customer">Customer</option>
 	    <option value="restaurant">Restaurant Manager</option>
-	  </select>
+	    </select>
 	  <br></br>
 	  </form>
       </div>
