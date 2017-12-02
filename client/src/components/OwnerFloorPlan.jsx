@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import Grid from 'material-ui/Grid';
+import Button from 'material-ui/Button';
+import { generateTables } from '../clientHelpers/ownerHelpers';
 
 
 const styles = theme => ({
@@ -30,9 +32,9 @@ const styles = theme => ({
     },
   },
   selectedSquare: {
-    border: '1px solid #eeeeee',
+    border: '1px solid #AD1457',
     boxSizing: 'border-box',
-    background: 'rgb(173, 20, 87)',
+    background: '#AD1457',
   },
 });
 
@@ -45,6 +47,7 @@ class OwnerFloorPlan extends React.Component {
       numRows: 10,
       numCols: 10,
       matrix: [],
+      tables: [],
     };
   }
 
@@ -55,12 +58,6 @@ class OwnerFloorPlan extends React.Component {
     });
   }
 
-  createMatrix = () => {
-    const { numRows, numCols } = this.state;
-    const row = Array(numCols).fill(0);
-    const matrix = Array(numRows).fill(row);
-    return matrix;
-  }
 
   squares() {
     const { numRows, numCols, matrix } = this.state;
@@ -80,9 +77,7 @@ class OwnerFloorPlan extends React.Component {
             key={[row, col]}
             value={matrix[row][col]}
             onClick={() => this.onSquareClick([row, col])}
-          >
-          {`${row} ${col}`}
-          </div>
+          />
         );
       }
     }
@@ -93,15 +88,26 @@ class OwnerFloorPlan extends React.Component {
   onSquareClick = (coordinates) => {
     const [row, col] = coordinates;
     const newMatrix = [...this.state.matrix];
-    console.log(newMatrix);
-    newMatrix[row][col] = 1;
-    // newMatrix[row][col] = (newMatrix[row][col]) ? 0 : 1;
-    console.log(newMatrix);
+    newMatrix[row][col] = (newMatrix[row][col]) ? 0 : 1;
     this.setState({
       matrix: newMatrix,
     });
-  };
+  }
 
+  onSaveClick = (e) => {
+    e.preventDefault();
+    const tables = generateTables(this.state.matrix);
+    this.setState({
+      tables,
+    });
+  }
+
+  createMatrix = () => {
+    const { numRows, numCols } = this.state;
+    const row = Array(numCols).fill(0);
+    const matrix = row.map(() => [...row]);
+    return matrix;
+  }
 
   render() {
     return (
@@ -109,7 +115,9 @@ class OwnerFloorPlan extends React.Component {
         <div className={this.props.classes.grid} >
         { this.squares() }
         </div>
-
+        <Button type="null" raised color="accent" onClick={e => this.onSaveClick(e)} >
+          Save
+        </Button>
       </Paper>
     );
   }
