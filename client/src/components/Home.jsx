@@ -2,12 +2,30 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import _ from 'underscore';
+import { MuiThemeProvider, createMuiTheme, withStyles } from 'material-ui/styles';
+import pink from 'material-ui/colors/pink';
+import indigo from 'material-ui/colors/indigo';
+import red from 'material-ui/colors/red';
+import Search from './Search';
+import AvailableReservations from './AvailableReservations';
+import Myreservations from './Myreservations';
+import Loader from './Refresh';
+import Confirmation from './ConfirmationPage';
 
-import { withStyles } from 'material-ui/styles';
-import { Switch, Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
-import Search from './Search.jsx';
-import AvailableReservations from './AvailableReservations.jsx';
-import Myreservations from './Myreservations.jsx';
+const theme = createMuiTheme({
+  palette: {
+    // primary: pink['800'],
+    primary: {
+      ...pink,
+      500: '#ad1457',
+    },
+    secondary: {
+      ...indigo,
+      A700: '#304ffe',
+    },
+    error: red,
+  },
+});
 
 const styles = theme => ({
   root: {
@@ -32,6 +50,8 @@ class Home extends React.Component {
       party: 2,
       category: 'All',
       selectedRestaurant: [],
+      isLoading: false,
+      reservation: [],
       currUserName: '',
       currUserProfile: '',
     };
@@ -57,65 +77,13 @@ class Home extends React.Component {
         console.log('Error getting results', err);
       });
   }
-
-  componentWillMount() {
-    const self = this;
-    axios.get('/data')
-      .then((results) => {
-        let timeData = {};
-        let partySizeData = {};
-        let categoryData = {};
-
-        // Funnels all data into a corresponding object to remove duplicates
-        _.forEach(results.data, (restaurant) => {
-          _.forEach(restaurant.times, (time) => {
-            timeData[time] = time;
-          });
-
-          _.forEach(restaurant.partySizes, (size) => {
-            partySizeData[size] = size;
-          });
-
-          _.forEach(restaurant.categories, (cat) => {
-            categoryData[cat] = cat;
-          });
-        });
-
-
-        timeData = ['All'].concat(Object.keys(timeData).sort((a, b) => {
-          // Change two strings of times into numbers so we can easily compare them
-          // Ex: a = '5:00 PM' -> time1 = 500
-          //     b = '6:30 PM' -> time2 = 630
-          let time1 = a.split(' PM').join('').split(':');
-          time1 = (time1[0] * 100) + time1[1];
-
-          let time2 = b.split(' PM').join('').split(':');
-          time2 = (time2[0] * 100) + time2[1];
-
-          return parseInt(time1, 10) - parseInt(time2, 10);
-        }));
-        partySizeData = ['All'].concat(Object.keys(partySizeData).sort());
-        categoryData = ['All'].concat(Object.keys(categoryData).sort());
-
-        self.setState({
-          data: results.data,
-          times: timeData,
-          partySizes: partySizeData,
-          categories: categoryData,
-        });
-      }).catch((err) => {
-        throw err;
-      });
-  }
-
-
   onStateChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
 
 
   onSearchSubmitClick(city, partySize) {
-    console.log(partySize);
+    this.setState({ isLoading: true });
     const self = this;
     axios.post('/city', { city })
       .then((results) => {
@@ -132,6 +100,7 @@ class Home extends React.Component {
               party: partySize,
             });
           }).then(() => {
+            this.setState({ isLoading: false });
             console.log('Data', this.state.data);
           })
             .catch((err) => {
@@ -156,7 +125,6 @@ class Home extends React.Component {
             restaurant: reservation.name,
           });
         });
-
         self.setState({
           myReservations
         });
@@ -167,51 +135,20 @@ class Home extends React.Component {
     // query db for reservations with this phone number
   }
 
-  onFilterSubmitClick(time, party, category) {
+  onFilterSubmitClick(time, restaurant, category) {
     // filter avaiable restaurants
     this.setState({
       time,
-      party,
+      restaurant,
       category,
     });
   }
 
-  onAcceptClick(reservationTime, restaurant) {
-    // send data to db and repopulate my reservation list
-    const myReservations = this.state.myReservations.slice(0);
-    myReservations.push({
-      // id: reservation.id,
-      time: reservationTime,
-      party: this.state.party,
-      restaurant,
+  onAcceptClick(res, rest) {
+    this.setState({
+      reservation: res,
+      restaurant: rest,
     });
-
-    // Commenting out until we update how we handle booked reservations
-
-    // const restaurants = this.state.data.slice(0);
-    // _.forEach(restaurants, (rest) => {
-    //   if (rest.name === restaurant) {
-    //     _.forEach(rest.reservations, (res) => {
-    //       if (res.id === reservation.id) {
-    //         res.booked = true;
-    //       }
-    //     });
-    //   }
-    // });
-
-    // this.setState({
-    //   myReservations,
-    //   data: restaurants
-    // });
-
-    // axios.post('/book', {
-    //   reservationId: reservation.id,
-    //   phoneNumber: this.state.phoneNumber,
-    // })
-    //   .then(() => console.log('we successfully booked a place!'))
-    //   .catch((err) => {
-    //     throw err;
-    //   });
   }
 
   onCancelClick(index, reservation) {
@@ -245,64 +182,42 @@ class Home extends React.Component {
   }
 
   filterRestaurants() {
-    // This function creates the datapoints that populate the various dropdown filters
-    // Depends on the dataset coming from server
-
     const {
       data, time, party, category, restaurant,
     } = this.state;
 
-
-    // let filteredData =  [...data];
-
     const filteredData = _.filter([...data], (allInfo) => {
-      const restaurantInfo = allInfo[0];
-      const categories = restaurantInfo.categories.map(cat => cat.title);
+      const restaurantInfo = allInfo;
+      const categories = restaurantInfo.category;
       const restaurantName = restaurantInfo.name.toLowerCase().trim();
 
       return (
-        (category === 'All' || categories.includes(category)) &&
-        (restaurant === '' || restaurantName.includes(restaurant.toLowerCase().trim()))
+        (category === 'All' || categories === category &&
+        (restaurant === '' || restaurantName.includes(restaurant.toLowerCase().trim())))
       );
     });
-
-    // const filters = {
-    //   times: time,
-    //   // partySizes: (party === 'All') ? 'All' : Number(party),
-    //   categories: category,
-    //   name: restaurant,
-    // };
-
-    // let filteredData =  [...data];
-
-    // _.forEach(filters, (filter, key) => {
-    //   if (filter !== 'All' && filter !== '') {
-    //     filteredData = _.filter(filteredData, restaurant =>
-    //       restaurant[key].includes(filter));
-    //   }
-    // });
     return filteredData;
   }
 
 
   render() {
     const { classes } = this.props;
+    if (this.state.isLoading) {
+      return (
+        <MuiThemeProvider theme={theme}>
+        <Loader />
+      </MuiThemeProvider>
+      );
+    }
+    if (this.state.restaurant.length !== 0) {
+      return ( 
+      <MuiThemeProvider theme={theme}>
+      <Confirmation reservation = {this.state.reservation} restaurant={this.state.restaurant} />
+      </MuiThemeProvider>
+      );
+    }
     return (
-      <div>
-        { (this.state.currUserName.length > 0) ? 
-          ( 
-          <div>
-          <p><a href="/logout">Logout</a></p>
-          Welcome {this.state.currUserName} ! 
-          <img src={this.state.currUserProfile} /> 
-          </div>
-          ) : (
-          <div>
-          <p><a href="/">Login</a></p>
-          </div>
-          )
-        }
-        <br/><br/>
+      <MuiThemeProvider theme={theme}>
         <Search
           phoneNumber={this.state.phoneNumber}
           times={this.state.times}
@@ -322,7 +237,7 @@ class Home extends React.Component {
           reservations={this.state.myReservations}
           onCancelClick={this.onCancelClick}
         />
-      </div>
+      </MuiThemeProvider>
     );
   }
 }

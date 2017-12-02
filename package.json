@@ -16,6 +16,7 @@
     "db-stop": "pg_ctl -D /usr/local/var/postgres stop -s -m fast"
   },
   "dependencies": {
+    "@types/material-ui": "^0.18.5",
     "axios": "^0.17.1",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
