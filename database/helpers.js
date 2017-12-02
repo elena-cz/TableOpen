@@ -70,6 +70,13 @@ const addReservationToDatabase = (restaurant_id, isReservationBooked, party_size
   return Reservation.forge(data).save().then(reservation => reservation);
 };
 
+///  Helper functions for owner portal
+
+
+
+
+
+
 module.exports = {
   addFbCustomerToDataBase,
   grabCustomerByFbId,

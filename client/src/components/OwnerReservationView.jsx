@@ -12,7 +12,6 @@ const styles = theme => ({
   root: {
     marginBottom: theme.spacing.unit * 3,
     flexGrow: 1,
-    padding: 16,
   },
   paper: {
     marginTop: 30,
@@ -137,7 +136,7 @@ class OwnerReservationView extends React.Component {
   }
 
   render() {
-    const { times, classes } = this.props;
+    const { classes } = this.props;
     return (
       <div className={classes.root}>
         <Paper className={classes.paper} >
@@ -152,7 +151,7 @@ class OwnerReservationView extends React.Component {
                 <Grid item xs={12}>
                   <p>View reservations by time:</p>
                 </Grid>
-                {times.slice(1).map(time => (
+                {['5:00pm', '5:30pm', '6:00pm', '6:30pm', '7:00pm', '7:30pm', '8:00pm', '8:30pm', '9:00pm'].map(time => (
                   <Grid item xs={12}>
                     <Button 
                       color="accent"
