@@ -13,6 +13,10 @@ import AvailableReservations from './components/AvailableReservations';
 import Myreservations from './components/Myreservations';
 import Loader from './components/Refresh';
 import Confirmation from './components/ConfirmationPage';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
+import Home from './components/Home';
+import SignUp from './components/SignUp';
 // Global theme
 
 const theme = createMuiTheme({
@@ -30,16 +34,6 @@ const theme = createMuiTheme({
   },
 });
 
-const styles = theme => ({
-  root: {
-    flexGrow: 1,
-    width: '100%',
-    height: '100%',
-  },
-});
-
-
-// Root component for app
 
 class App extends React.Component {
   constructor(props) {
@@ -265,32 +259,20 @@ class App extends React.Component {
       );
     }
     return (
-      <MuiThemeProvider theme={theme}>
+     <MuiThemeProvider theme={theme}>
+      <Router>
+      <div>
         <TopMenu />
-        <Search
-          phoneNumber={this.state.phoneNumber}
-          times={this.state.times}
-          categories={this.state.categories}
-          onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
-          onSearchSubmitClick={this.onSearchSubmitClick}
-          onFilterSubmitClick={this.onFilterSubmitClick}
-          onStateChange={this.onStateChange}
-        />
-        <AvailableReservations
-          restaurantData={this.filterRestaurants()}
-          onAcceptClick={this.onAcceptClick}
-          time={this.state.time}
-          party={this.state.party}
-        />
-        <Myreservations
-          reservations={this.state.myReservations}
-          onCancelClick={this.onCancelClick}
-        />
-      </MuiThemeProvider>
-    );
+        <Route exact path='/' component={LoginPage} />
+        <Route path='/home' component={Home}/>
+        <Route path='/signup' component={SignUp}/>
+      </div>
+      </Router>
+     </MuiThemeProvider>
+    )
   }
 }
 
-export default withStyles(styles)(App);
+export default App;
 
 ReactDOM.render(<App />, document.getElementById('app'));
