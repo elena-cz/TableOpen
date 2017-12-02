@@ -271,7 +271,7 @@ class App extends React.Component {
             reservations={this.state.myReservations}
             onCancelClick={this.onCancelClick}
           />
-          <OwnerPortal />
+          <OwnerPortal times={this.state.times} />
       </MuiThemeProvider>
     );
   }

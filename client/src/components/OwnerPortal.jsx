@@ -51,7 +51,7 @@ class OwnerPortal extends React.Component {
 
   render() {
     const { editFloorPlan, name, image_url, address1, display_phone } = this.state;
-    const { classes } = this.props;
+    const { times, classes } = this.props;
     return (
       <div className={classes.root} >
         <Paper className={classes.paper} >
@@ -81,10 +81,10 @@ class OwnerPortal extends React.Component {
           </Grid>
         </Grid>
         </Paper>
-        {(editFloorPlan)
-          ? <OwnerFloorPlan toggleEditMode={this.toggleEditMode} />
-          : <OwnerReservationView />
-        }
+          {(editFloorPlan)
+            ? <OwnerFloorPlan toggleEditMode={this.toggleEditMode} />
+            : <OwnerReservationView times={times} />
+          }
       </div>
     );
   }
