@@ -43,7 +43,6 @@ const theme = createMuiTheme({
 class App extends React.Component {
 
   render() {
-    const { classes } = this.props;
     return (
       <MuiThemeProvider theme={theme}>
         <Router>

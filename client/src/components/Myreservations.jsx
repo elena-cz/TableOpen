@@ -4,6 +4,7 @@ import MyReservation from './Myreservation';
 import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import Grid from 'material-ui/Grid';
+import Typography from 'material-ui/Typography';
 
 const styles = theme => ({
   root: {
@@ -26,7 +27,9 @@ const MyReservations = props => (
       spacing={24}
     >
       <div className="myReservations">
-      <h3>My Reservations</h3>
+      <Typography type="title" gutterBottom>
+        My Reservations
+      </Typography>
         {(props.reservations.length === 0) ?
           <div>No Reservations</div> : props.reservations.map((reservation, idx) =>
             (

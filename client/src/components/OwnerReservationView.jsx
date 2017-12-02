@@ -11,6 +11,8 @@ import { getMatrixFromCoordinates } from '../clientHelpers/ownerHelpers';
 const styles = theme => ({
   root: {
     marginBottom: theme.spacing.unit * 3,
+    flexGrow: 1,
+    padding: 16,
   },
   paper: {
     marginTop: 30,
@@ -63,7 +65,6 @@ class OwnerReservationView extends React.Component {
       matrix: [],
       tables: [],
       selectedTime: '5:00pm',
-
     };
   }
 

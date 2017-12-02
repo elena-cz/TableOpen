@@ -1,3 +1,9 @@
+export const generateMatrix = (numRows, numCols) => {
+  const row = Array(numCols).fill(false);
+  const matrix = row.map(() => [...row]);
+  return matrix;
+};
+
 const createTable = (id, size, coordinates) => ({
   id,
   size,
@@ -15,7 +21,7 @@ export const generateTables = (inputMatrix) => {
       const square = matrix[row][col];
       matrix[row][col] = 0;
 
-      if (square === 1) {
+      if (square) {
         let size = 2;
         const coordinates = [[row, col]];
         tableId += 1;
@@ -23,21 +29,21 @@ export const generateTables = (inputMatrix) => {
         // Add adjacent squares in row
         let squaresInRow = 1;
         let nextCol = col + 1;
-        while (matrix[row][nextCol] === 1) {
+        while (matrix[row][nextCol]) {
           size += 2;
           squaresInRow += 1;
           coordinates.push([row, nextCol]);
-          matrix[row][nextCol] = 0;
+          matrix[row][nextCol] = false;
           nextCol += 1;
         }
 
         // Add adjacent squares in columns
         for (let i = 0; i < squaresInRow; i += 1) {
           let nextRow = row + 1;
-          while (matrix[nextRow] && matrix[nextRow][col + i] === 1) {
+          while (matrix[nextRow] && matrix[nextRow][col + i]) {
             size += 2;
             coordinates.push([nextRow, col + i]);
-            matrix[nextRow][col + i] = 0;
+            matrix[nextRow][col + i] = false;
             nextRow += 1;
           }
         }
@@ -51,3 +57,16 @@ export const generateTables = (inputMatrix) => {
   console.log(inputMatrix);
   return tables;
 };
+
+
+export const getMatrixFromCoordinates = (tables) => {
+  const matrix = generateMatrix(10, 10);
+  tables.forEach((table) => {
+    table.coordinates.forEach((coordinate) => {
+      const [row, col] = coordinate;
+      matrix[row][col] = 1;
+    });
+  });
+  return matrix;
+};
+
