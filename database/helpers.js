@@ -2,17 +2,41 @@ const bookshelf = require('./index').bookshelf;
 const Restaurant = require('./models/Restaurants');
 const Reservation = require('./models/Reservations');
 const SearchedCity = require('./models/SearchedCities');
+const Customer = require('./models/Customers.js');
 
-// adds a customer to the database
-const addCustomerToDataBase = (name, phone) => {
-  const customer = new db.Customer();
-  customer.set('name', name);
-  customer.set('phone', phone);
-  customer.save().then(user => user);
+// returns a customer given their Facebook ID
+const grabCustomerByFbId = id => Customer.forge().query({ where: { facebook_id: id } }).fetch();
+
+// adds a customer logging in by Facebook to the database
+const addFbCustomerToDataBase = (email, name, user_type, facebook_id) => {
+  const data = {
+    email,
+    name,
+    user_type,
+    facebook_id,
+  };
+  return Customer.forge(data).save().then(customer => customer);
 };
 
-// returns a customer's ID
-const grabCustomerById = id => db.Customer.byId(id);
+//returns a customer given their username (email)
+const grabCustomerById = (id, password) => Customer.forge().query({ where: { email: id, password: password } }).fetch();
+
+// adds a non-Facebook customer to the database
+const addCustomerToDataBase = (email, name, password, user_type) => {
+  const data = {
+    email,
+    name,
+    password,
+    user_type,
+  };
+  return Customer.forge(data).save().then(customer => customer);
+};
+
+// updates a customer's choice of user type by Facebook ID
+const updateFbUserType = (id, usertype) => {
+  return Customer.forge().where({facebook_id: id }).save({user_type: usertype}, {patch: true}).then((results) => results);
+};
+
 const addCityToDatabase = (city) => {
   const data = {
     city,
@@ -47,6 +71,9 @@ const addReservationToDatabase = (restaurant_id, isReservationBooked, party_size
 };
 
 module.exports = {
+  addFbCustomerToDataBase,
+  grabCustomerByFbId,
+  updateFbUserType,
   addCustomerToDataBase,
   grabCustomerById,
   addRestaurantToDataBase,

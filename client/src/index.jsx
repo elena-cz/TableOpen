@@ -17,6 +17,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import Home from './components/Home';
 import SignUp from './components/SignUp';
+import LoginError from './components/Error.jsx';
 // Global theme
 
 const theme = createMuiTheme({
@@ -266,6 +267,7 @@ class App extends React.Component {
         <Route exact path='/' component={LoginPage} />
         <Route path='/home' component={Home}/>
         <Route path='/signup' component={SignUp}/>
+        <Route path='/error' component={LoginError}/>
       </div>
       </Router>
      </MuiThemeProvider>
