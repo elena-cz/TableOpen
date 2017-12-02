@@ -1,6 +1,8 @@
 const express = require('express');
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
+const { client } = require('../database/index.js');
 // const twilio = require('../helpers/twilioApi.js');
 const { getRestaurantsByCity } = require('../helpers/yelpApi.js');
 const {
@@ -15,6 +17,39 @@ const {
 
 const PORT = 3000;
 const app = express();
+
+const passport = require('passport');
+// Requirements for Facebook passport authentication
+const FacebookStrategy = require('passport-facebook').Strategy;
+// Requirements for local passport authentication
+var Strategy = require('passport-local').Strategy;
+
+const jsonParser = bodyParser.json()
+const urlencodedParser = bodyParser.urlencoded({ extended: false })
+
+//These parameters are communicated with client
+let currUserName = '';
+let currUserProfile = '';
+let currEmail = '';
+let currFriends = '';
+let currType = 'customer';
+let currPassword = '';
+
+app.get('/facebookData', (req, res) => {
+  res.send({currUserName: currUserName, currUserProfile: currUserProfile});
+});
+ 
+app.post('/typeof', jsonParser, (req, res) => {
+  currType = req.body.type;
+  res.end();
+});
+
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+
+app.use(session({ secret: 'anything', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.static(path.join(__dirname, '/../client/dist')));
 app.use(bodyParser.json());
@@ -58,6 +93,145 @@ app.post('/reservations', (req, res) => {
     res.status(200);
     res.send(JSON.stringify(data));
   });
+});
+
+//helper function that checks if user is authenticated
+const authenticated =  (req, res, next) =>{
+  if(req.isAuthenticated()){
+    return next();
+  }
+  res.redirect('/home');
+}
+
+app.get('/home', (req, res) => {
+  res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
+});
+
+app.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
+});
+
+
+//Use Facebook Strategy
+passport.use(new FacebookStrategy({
+    clientID: '1599506193439803',
+    clientSecret: '3503ebf58772e5335ab25bd5e8b352f5',
+    callbackURL: "http://localhost:3000/auth/facebook/callback",
+    profileFields: ['id', 'emails', 'displayName', 'picture', 'address', 'friends'],
+  },
+  function(accessToken, refreshToken, profile, done) {
+    //Check customers table for anyone with a Facebook ID of profile.id
+    currUserName = profile.displayName;
+    currUserProfile = profile.photos[0].value;
+    currEmail = profile._json.email;
+    currFriends = profile._json.friends;
+    client.query(`SELECT * FROM customers WHERE facebook_id = '${profile.id}';`, function(err, user) {
+      if (err) {
+          return done(err);
+      }
+      //If no user is found, create a new user with values from Facebook
+      if (user.rowCount === 0) {
+        client.query(`INSERT INTO customers (email, name, user_type, facebook_id) VALUES ('${profile._json.email}', '${profile.displayName}', '${currType}', '${profile.id}');`, function(err, data) {
+          done(null, user);
+          if (err) {
+            console.log('error entering customer into database');
+            return done(err);
+          }
+        });
+      } else {
+        client.query(`UPDATE customers SET user_type = '${currType}');`, function(err, data) {
+          if(err) {
+            console.log('error updating records');
+          }
+          console.log(data);
+        });
+      done(null, user);
+    }
+    });
+  })
+);
+
+//// Redirect the user to Facebook for authentication.  When complete,
+// Facebook will redirect the user back to the application at
+//     /auth/facebook/callback
+
+app.get('/auth/facebook', passport.authenticate('facebook',  {scope: ['email', 'user_friends']}));
+
+app.get('/auth/facebook/callback', 
+  passport.authenticate('facebook', { failureRedirect: '/',
+    successRedirect: '/home',
+    scope: ['email', 'user_friends']}
+    )                         
+);
+
+//serializeUser determines which data of the user object should be stored in the session
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+//deserializeUser retrieves user object with help of id key
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
+//Passport local strategy
+passport.use('local', new Strategy(
+  function(username, password, done) {
+   currUserName = username;
+   client.query(`SELECT * FROM customers WHERE email = '${username}' AND password = '${password}';`, (err, user) => {if (err) {
+          return done(err);
+        }
+      if(user.rowCount === 0) {
+        return done(null, false);
+      } else {
+        return done(null, user);
+      }
+    }
+)}));
+
+passport.use('local-signup', new Strategy({
+    passReqToCallback: true,
+    session: false
+  },
+  function(req, username, password, done) {
+    currUserName = req.body.name;
+    client.query(`INSERT INTO customers (email, name, password, user_type) VALUES ('${username}', '${req.body.name}', '${password}', '${req.body.usertype[0]}');`, function(err, user) {
+        if (err) {
+          console.log('error entering customer into database');
+          return done(err);
+        }
+        return done(null, user);
+      });
+ }));
+
+app.post('/newuser', urlencodedParser, 
+   passport.authenticate('local-signup', { failureRedirect: '/signup', successRedirect: '/home'})
+);
+
+app.post('/loginpassport', urlencodedParser, passport.authenticate('local',
+  { successRedirect: '/home', failureRedirect: '/' })
+);
+
+//responds to logout request
+app.get('/logout', function(req, res) {
+  req.logout();
+  currUserName = '';
+  currUserProfile = '';
+  res.redirect('/');
+});
+
+// initialize the database with a yelp query for 1000 SF restaurants
+// seedDatabase();
+
+// const visitedCities = ['San Francisco, CA'];
+
+// App will initially load with SF as the default city
+app.get('/data', (request, response) => {
+  queryDatabaseForCity()
+    .then(cityResults => response.send(formatCityResults(cityResults)))
+    .catch((err) => {
+      throw err;
+    });
 });
 
 app.post('/book', (request, response) => {

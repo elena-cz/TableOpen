@@ -17,6 +17,10 @@ exports.up = (knex, Promise) => Promise.all([
     table.increments('id').primary();
     table.string('phone');
     table.string('name');
+    table.string('email');
+    table.string('password');
+    table.string('user_type');
+    table.string('facebook_id');
   }).createTable('reservations', (table) => {
     table.increments('id').primary();
     table.integer('restaurant_id').references('restaurants.id');
@@ -32,5 +36,5 @@ exports.up = (knex, Promise) => Promise.all([
 
 exports.down = (knex, Promise) => Promise.all([knex.schema.dropTable('restaurants')
   .dropTable('reservations')
-  .dropTable('customer'),
+  .dropTable('customers'),
 ]);

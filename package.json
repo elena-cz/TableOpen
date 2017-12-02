@@ -28,11 +28,23 @@
     "knex": "^0.13.0",
     "material-ui": "^1.0.0-beta.22",
     "material-ui-icons": "^1.0.0-beta.17",
+    "ejs": "^2.5.7",
+    "connect-flash": "^0.1.1",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
     "moment": "^2.19.2",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-local": "^1.0.0",
     "pg": "^7.4.0",
     "prop-types": "^15.6.0",
+    "psql": "0.0.1",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
+    "react-helper": "^2.1.0",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
     "request": "^2.83.0",
     "twilio": "^3.10.0",
     "typeface-roboto": "0.0.45",
@@ -58,7 +70,8 @@
   },
   "babel": {
     "presets": [
-      "es2015", "stage-2"
+      "es2015",
+      "stage-2"
     ]
   }
 }
