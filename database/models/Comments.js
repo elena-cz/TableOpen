@@ -1,10 +1,10 @@
 const bookshelf = require('../index').bookshelf;
 const Restaurant = require('./Restaurants');
 const Customer = require('./Customers');
-const Comment = require('./Comments');
+const Reservation = require('./Reservations');
 
-const Reservation = bookshelf.Model.extend({
-  tableName: 'reservations',
+const Comment = bookshelf.Model.extend({
+  tableName: 'comments',
   byId(id) {
     return this.forge().query({ where: { id } }).fetch();
   },
@@ -14,9 +14,9 @@ const Reservation = bookshelf.Model.extend({
   customer() {
     return this.belongsTo('Customer');
   },
-  comment() {
-    return this.hasMany('Comment', 'customer_id');
+  reservation() {
+    return this.belongsTo('Reservation');
   },
 });
 
-module.exports = bookshelf.model('Reservation', Reservation);
+module.exports = bookshelf.model('Comment', Comment);

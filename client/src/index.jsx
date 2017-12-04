@@ -11,7 +11,7 @@ import SignUp from './components/SignUp';
 import TopMenu from './components/TopMenu';
 import LoginError from './components/Error';
 import OwnerPortal from './components/OwnerPortal';
-
+import MyReservations from './components/Myreservations';
 
 // Global theme
 
@@ -32,22 +32,43 @@ const theme = createMuiTheme({
 
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      currUserName: '',
+      currUserProfile: '',
+      showReservations: false,
+    };
+    this.myClick = this.myClick.bind(this);
+  }
+
+  myClick() {
+    this.setState({
+      showReservations: true,
+    });
+  }
 
   render() {
     return (
       <MuiThemeProvider theme={theme}>
         <Router>
           <div>
-            <TopMenu />
-            <Route exact path='/' component={LoginPage} />
-            <Route path='/home' component={Home}/>
-            <Route path='/manager' component={OwnerPortal}/>
-            <Route path='/signup' component={SignUp}/>
-            <Route path='/error' component={LoginError}/>
+            <TopMenu myClick={this.myClick} />
+            <Route exact path="/" component={LoginPage} />
+            <Route
+              path="/home"
+              render={routeProps => (
+                <Home showReservations = {this.state.showReservations} />
+  )}
+            />
+            <Route path="/manager" component={OwnerPortal} />
+            <Route path="/signup" component={SignUp} />
+            <Route path="/error" component={LoginError} />
+            <Route path="/reservations" component={MyReservations}/>
           </div>
         </Router>
       </MuiThemeProvider>
-    )
+    );
   }
 }
 

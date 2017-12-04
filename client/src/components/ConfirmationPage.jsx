@@ -55,7 +55,7 @@ class Confirmation extends React.Component {
   }
 
   handleSubmit() {
-    console.log(this.state.input);
+    this.props.confirmationClick(this.state.input);
   }
 
   handleChange(e) {
@@ -64,29 +64,44 @@ class Confirmation extends React.Component {
     });
   }
 
+  createDate() {
+    let today = new Date();
+    let dd = today.getDate();
+    let mm = today.getMonth() + 1; // January is 0!
+    const yyyy = today.getFullYear();
+    if (dd < 10) {
+      dd = `0${dd}`;
+    }
+    if (mm < 10) {
+      mm = `0${mm}`;
+    }
+    today = `${mm}/${dd}/${yyyy}`;
+    return today;
+  }
+
   render() {
     const { classes } = this.props;
     return (
       <Paper className={classes.paper}>
-      <div>
-        <div className="confirmation" />
-        <h3 className={classes.blackHeadline}> Please confirm your reservation for December 1st at { this.props.reservation.time } at { this.props.restaurant } for { this.props.reservation.party_size } </h3>
-        <form onSubmit={this.handleSubmit} className={classes.container}>
-          <label>
-          <div className={classes.accomodations} >Enter any special accomodations here:</div>
-            <textarea value={this.state.input} onChange={this.handleChange} className={classes.textField}/>
-          <div className={classes.button}>
-          <Button
-            type="submit"
-            raised
-            color="accent"
-          >
+        <div>
+          <div className="confirmation" />
+          <h3 className={classes.blackHeadline}> Please confirm your reservation for {this.createDate()} at { this.props.reservation.time } at { this.props.restaurant } for { this.props.reservation.party_size } </h3>
+          <form onSubmit={this.handleSubmit} className={classes.container}>
+            <label>
+              <div className={classes.accomodations} >Enter any special accomodations here:</div>
+              <textarea value={this.state.input} onChange={this.handleChange} className={classes.textField} />
+              <div className={classes.button}>
+                <Button
+                type="submit"
+                raised
+                color="accent"
+              >
             Confirm
-          </Button>
-          </div>
-          </label>
-        </form>
-      </div>
+              </Button>
+              </div>
+            </label>
+          </form>
+        </div>
       </Paper>
     );
   }
