@@ -12,6 +12,8 @@ exports.up = (knex, Promise) => Promise.all([
     table.string('image');
     table.integer('review_count');
     table.decimal('rating', 2, 1);
+    table.text('comments', 'longtext');
+    table.text('floorplan', 'longtext');
   }).createTable('customers', (table) => {
     table.increments('id').primary();
     table.string('phone');
@@ -26,6 +28,7 @@ exports.up = (knex, Promise) => Promise.all([
     table.boolean('isReservationBooked');
     table.integer('party_size');
     table.string('time');
+    table.text('coordinates');
     table.integer('customer_id').references('customers.id');
   }).createTable('searched_cities', (table) => {
     table.increments('id').primary();

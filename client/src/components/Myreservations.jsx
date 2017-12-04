@@ -31,7 +31,7 @@ const MyReservations = (props) => {
   return (
     <Paper className={classes.paper}>
       {(props.reservations.length === 0) ?
-            <div>No Reservations</div> : props.reservations.map((reservation, idx) =>
+        <div>No Reservations</div> : props.reservations.map((reservation, idx) =>
         (<Grid
           container
           spacing={100}
@@ -39,18 +39,17 @@ const MyReservations = (props) => {
           direction="row"
           justify="space-between"
         >
-        <div className={classes.entry}>
-        <Paper className={classes.resPaper}>
-          <MyReservation
-            reservation={reservation}
-            key={reservation.id}
-            index={idx}
-            cancel={props.onCancelClick}
-            href="/home"
-          />
-          </Paper>
+          <div className={classes.entry}>
+            <Paper className={classes.resPaper}>
+              <MyReservation
+              reservation={reservation}
+              key={reservation.id}
+              index={idx}
+              cancel={props.onCancelClick}
+            />
+            </Paper>
           </div>
-         </Grid>
+        </Grid>
         ))}
     </Paper>
   );

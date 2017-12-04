@@ -12,6 +12,9 @@ import MyReservations from './Myreservations';
 import Loader from './Refresh';
 import Confirmation from './ConfirmationPage';
 import Button from 'material-ui/Button';
+import { Switch, Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
+import Avatar from 'material-ui/Avatar';
+import classNames from 'classnames';
 
 const theme = createMuiTheme({
   palette: {
@@ -34,6 +37,18 @@ const styles = theme => ({
     width: '100%',
     height: '100%',
   },
+  avatar: {
+    margin: 5,
+    marginLeft: 10,
+  },
+  bigAvatar: {
+    width: 45,
+    height: 45,
+  },
+  row: {
+    display: 'inline-flex',
+    justifyContent: 'left',
+  },
 });
 
 class Home extends React.Component {
@@ -55,6 +70,7 @@ class Home extends React.Component {
       reservation: [],
       currUserName: '',
       currUserProfile: '',
+      showReservations: this.props.showReservations,
     };
     this.onAcceptClick = this.onAcceptClick.bind(this);
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
@@ -69,7 +85,6 @@ class Home extends React.Component {
   componentDidMount() {
     axios.get('/facebookData')
       .then((results) => {
-        console.log(results);
         this.setState({
           currUserProfile: results.data,
         });
@@ -78,14 +93,19 @@ class Home extends React.Component {
         console.log('Error getting results', err);
       });
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.showReservations === true) {
+      this.myClick();
+    }
+  }
+
   onStateChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
 
-
   onSearchSubmitClick(city, partySize) {
     this.setState({ isLoading: true });
-    const self = this;
     axios.post('/city', { city })
       .then((results) => {
         if (results) {
@@ -163,12 +183,12 @@ class Home extends React.Component {
       restaurant: ' ',
     });
     axios.post('/updateReservations', data)
-      .then(result => console.log(result));
+      .then(result => axios.get('/home'));
   }
 
   onCancelClick(id) {
     // send data to bd and repopulate my reservation list
-    axios.put('/cancel', {id}).then((result) => {
+    axios.put('/cancel', { id }).then((result) => {
       this.setState({
         reservationFilter: 'HIDE',
         myReservations: [],
@@ -233,29 +253,39 @@ class Home extends React.Component {
     }
     return (
       <MuiThemeProvider theme={theme}>
-        <Button
-          onClick={this.myClick.bind(this)}
-          raised
-          color="accent"
-          className={classes.button}
-        >
-          My Reservations
-        </Button>
-        <Search
-          phoneNumber={this.state.phoneNumber}
-          times={this.state.times}
-          categories={this.state.categories}
-          onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
-          onSearchSubmitClick={this.onSearchSubmitClick}
-          onFilterSubmitClick={this.onFilterSubmitClick}
-          onStateChange={this.onStateChange}
-        />
-        <AvailableReservations
-          restaurantData={this.filterRestaurants()}
-          onAcceptClick={this.onAcceptClick}
-          time={this.state.time}
-          party={this.state.party}
-        />
+        <div>
+          <br />
+          { (this.state.currUserName.length > 0) ?
+          (
+            <div className={classes.row}>
+              <br />
+          Welcome {this.state.currUserName}!
+              <Avatar
+                src={this.state.currUserProfile}
+                className={classNames(classes.avatar, classes.bigAvatar)}
+              />
+            </div>
+          ) : (
+            <div />
+          )
+        }
+          <br /><br />
+          <Search
+            phoneNumber={this.state.phoneNumber}
+            times={this.state.times}
+            categories={this.state.categories}
+            onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
+            onSearchSubmitClick={this.onSearchSubmitClick}
+            onFilterSubmitClick={this.onFilterSubmitClick}
+            onStateChange={this.onStateChange}
+          />
+          <AvailableReservations
+            restaurantData={this.filterRestaurants()}
+            onAcceptClick={this.onAcceptClick}
+            time={this.state.time}
+            party={this.state.party}
+          />
+        </div>
       </MuiThemeProvider>
     );
   }

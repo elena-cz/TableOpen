@@ -1,23 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import axios from 'axios';
-import _ from 'underscore';
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
-import { withStyles } from 'material-ui/styles';
 import pink from 'material-ui/colors/pink';
 import indigo from 'material-ui/colors/indigo';
 import red from 'material-ui/colors/red';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import Search from './components/Search.jsx';
-import AvailableReservations from './components/AvailableReservations.jsx';
-import Myreservations from './components/Myreservations.jsx';
-import LoginPage from './components/LoginPage.jsx';
-import Home from './components/Home.jsx';
-import SignUp from './components/SignUp.jsx';
+import LoginPage from './components/LoginPage';
+import Home from './components/Home';
+import SignUp from './components/SignUp';
 import TopMenu from './components/TopMenu';
-import LoginError from './components/Error.jsx';
-import Confirmation from './components/ConfirmationPage.jsx';
-import MyReservations from './components/myreservations.jsx';
+import LoginError from './components/Error';
+import OwnerPortal from './components/OwnerPortal';
+import MyReservations from './components/Myreservations';
 
 // Global theme
 
@@ -30,7 +24,7 @@ const theme = createMuiTheme({
     },
     secondary: {
       ...indigo,
-      A700: '#304ffe',
+      A700: '#3b5998',
     },
     error: red,
   },
@@ -38,25 +32,43 @@ const theme = createMuiTheme({
 
 
 class App extends React.Component {
-  
-  render() {
-    const { classes } = this.props;
-    return (
-     <MuiThemeProvider theme={theme}>
-      <Router>
-      <div>
-        <TopMenu />
-        <Route exact path='/' component={LoginPage} />
-        <Route path='/home' component={Home}/>
-        <Route path='/signup' component={SignUp}/>
-        <Route path='/error' component={LoginError}/>
-        <Route path='/confirmation' component={Confirmation}/>
-        <Route path='/reservations' component={MyReservations}/>
+  constructor(props) {
+    super(props);
+    this.state = {
+      currUserName: '',
+      currUserProfile: '',
+      showReservations: false,
+    };
+    this.myClick = this.myClick.bind(this);
+  }
 
-      </div>
-      </Router>
-     </MuiThemeProvider>
-    )
+  myClick() {
+    this.setState({
+      showReservations: true,
+    });
+  }
+
+  render() {
+    return (
+      <MuiThemeProvider theme={theme}>
+        <Router>
+          <div>
+            <TopMenu myClick={this.myClick} />
+            <Route exact path="/" component={LoginPage} />
+            <Route
+              path="/home"
+              render={routeProps => (
+                <Home showReservations = {this.state.showReservations} />
+  )}
+            />
+            <Route path="/manager" component={OwnerPortal} />
+            <Route path="/signup" component={SignUp} />
+            <Route path="/error" component={LoginError} />
+            <Route path="/reservations" component={MyReservations}/>
+          </div>
+        </Router>
+      </MuiThemeProvider>
+    );
   }
 }
 

@@ -54,7 +54,7 @@ const MyReservation = (props) => {
           onClick={() => props.cancel(props.reservation.id)}
           type="submit"
           color="primary"
-          hovercolor="accent"
+          hoverColor="accent"
           href="/home"
           raised
         >

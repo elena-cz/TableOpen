@@ -46,6 +46,7 @@ let currType = 'customer';
 let currPassword = '';
 
 
+
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
@@ -56,6 +57,11 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, '/../client/dist')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post('/typeof', jsonParser, (req, res) => {
+ currType = req.body.type;
+ res.end();
+});
 
 app.get('/facebookData', (req, res) => {
   res.status(200);
@@ -132,6 +138,15 @@ const authenticated =  (req, res, next) =>{
 app.get('/home', (req, res) => {
   res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
 });
+
+app.get('/reservations', (req, res) => {
+  res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
+});
+
+app.get('/manager', (req, res) => {
+  res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
+});
+
 
 app.get('/error', (req, res) => {
   res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
@@ -220,7 +235,7 @@ passport.use('local-signup', new Strategy({
   },
   function(req, username, password, done) {
     currUserName = req.body.name;
-    addCustomerToDataBase(username, req.body.name, password, req.body.usertype[0])
+    addCustomerToDataBase(username, req.body.name, password, req.body.usertype)
     .then(user => {
       return done(null, user);
     })
