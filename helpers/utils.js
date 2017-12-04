@@ -4,6 +4,7 @@ const { sendConfirmationText, sendCancellationText } = require('../helpers/twili
 const db = require('../database/helpers.js');
 const Promise = require('bluebird');
 const Restaurant = require('../database/models/Restaurants');
+const Reservation = require('../database/models/Reservations');
 const SearchedCity = require('../database/models/SearchedCities');
 
 const alreadySearched = city => SearchedCity.query({
@@ -102,11 +103,103 @@ const queryDatabaseForCity = (city, party_size) => new Promise((resolve, reject)
   }).then(() => restaurants);
 });
 
+
+// Utils for owner portal
+
+const saveNewRestaurant = (restData) => {
+
+  const { name, category, address, city, state, zip, phone, url, image, review_count, rating, floorplan } = restData;
+
+  return db.addRestaurantToDataBase(name, category, address, city, state, zip, phone, url, image, review_count, rating, floorplan)
+    .then(result => result);
+};
+
+const getRestaurantReservationsByTime = (id) => {
+  return db.grabRestaurantReservationsById(id);
+    // .then(results => console.log('results, results'));
+};
+
+const createTable = (size, coordinates) => ({
+  size,
+  coordinates,
+});
+
+
+const generateTables = (inputMatrix) => {
+  const matrix = inputMatrix.map(row => [...row]);
+
+  const tables = [];
+
+  for (let row = 0; row < matrix.length; row += 1) {
+    for (let col = 0; col < matrix[0].length; col += 1) {
+      const square = matrix[row][col];
+      matrix[row][col] = 0;
+
+      if (square) {
+        let size = 2;
+        const coordinates = [[row, col]];
+
+        // Add adjacent squares in row
+        let squaresInRow = 1;
+        let nextCol = col + 1;
+        while (matrix[row][nextCol]) {
+          size += 2;
+          squaresInRow += 1;
+          coordinates.push([row, nextCol]);
+          matrix[row][nextCol] = false;
+          nextCol += 1;
+        }
+
+        // Add adjacent squares in columns
+        for (let i = 0; i < squaresInRow; i += 1) {
+          let nextRow = row + 1;
+          while (matrix[nextRow] && matrix[nextRow][col + i]) {
+            size += 2;
+            coordinates.push([nextRow, col + i]);
+            matrix[nextRow][col + i] = false;
+            nextRow += 1;
+          }
+        }
+
+        const newTable = createTable(size, coordinates);
+
+        tables.push(newTable);
+      }
+    }
+  }
+  return tables;
+};
+
+const generateReservationsForTables = (id, tables) => {
+  const promise = [];
+  tables.forEach((table) => {
+    for (let i = 5; i < 11; i++) {
+      let isResBooked = !!Math.floor(Math.random() * 2);
+      promise.push(db.addReservationToDatabase(id, isResBooked, table.size, null, `${i}:00`, JSON.stringify(table.coordinates)));
+      isResBooked = !!Math.floor(Math.random() * 2);
+      promise.push(db.addReservationToDatabase(id, isResBooked, table.size, null, `${i}:30`, JSON.stringify(table.coordinates)));
+    }
+  });
+  return Promise.all(promise).then(data => data);
+};
+
+const saveRestaurantReservationsByTime = (id, floorplan) => {
+
+  Restaurant.forge().where({ id }).save({ floorplan }, { patch: true }).then(results => results);
+  // Reservation.forge({ where: { restaurant_id: id } }).destroy();
+  const tables = generateTables(JSON.parse(floorplan));
+  return generateReservationsForTables(id, tables).then(data => data.data);
+};
+
+
 module.exports = {
   generateReservationTimes,
   saveNewCityData,
   queryDatabaseForCity,
   alreadySearched,
+  saveNewRestaurant,
+  getRestaurantReservationsByTime,
+  saveRestaurantReservationsByTime,
 };
 
 // const getCustomerReservations = (phoneNumber = '555-867-5309') => new Promise((resolve, reject) => {

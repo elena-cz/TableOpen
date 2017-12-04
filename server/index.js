@@ -12,6 +12,8 @@ const {
   createComment,
   grabReservationsByCustomerId,
   cancelReservation,
+  grabRestaurantByName,
+  grabRestaurantReservationsById,
 } = require('../database/helpers.js');
 // const { client } = require('../database/index.js');
 // const twilio = require('../helpers/twilioApi.js');
@@ -23,6 +25,9 @@ const {
   getCustomerReservations,
   bookReservation,
   alreadySearched,
+  saveNewRestaurant,
+  getRestaurantReservationsByTime,
+  saveRestaurantReservationsByTime,
 } = require('../helpers/utils.js');
 
 const PORT = 3000;
@@ -272,5 +277,29 @@ app.put('/cancel', (req, res) => {
 //   getCustomerReservations(req.body.phoneNumber)
 //     .then(results => res.send(results.rows));
 // });
+
+// Owner portal routes
+
+app.post('/restaurants', (request, response) => {
+  console.log('post to restaurants', request.body);
+  saveNewRestaurant(request.body)
+    .then(results => response.send(results.rows));
+});
+
+app.post('/restaurants/:restaurantId/reservations', (request, response) => {
+  saveRestaurantReservationsByTime(request.params.restaurantId, request.body.floorplan)
+    .then(results => response.send(results));
+});
+
+app.get('/restaurants/:restaurantId/reservations', (request, response) => {
+  grabRestaurantReservationsById(request.params.restaurantId)
+    .then(results => response.send(results));
+});
+
+app.get('/restaurant/:name', (request, response) => {
+  grabRestaurantByName(request.params.name)
+    .then(results => response.send(results));
+});
+
 
 app.listen(PORT, () => console.log(`The TableOpen server is listening on port ${PORT}!`));

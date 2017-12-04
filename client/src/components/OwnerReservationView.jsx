@@ -62,41 +62,40 @@ class OwnerReservationView extends React.Component {
       numRows: 10,
       numCols: 10,
       matrix: [],
-      tables: [],
-      selectedTime: '5:00pm',
+      // tables: [],
+      // selectedTime: '5:00pm',
     };
   }
 
   componentDidMount = () => {
-    const tables = [
-      {
-        size: 2,
-        coordinates: [[0, 3]],
-        booked: true,
-      },
-      {
-        size: 8,
-        coordinates: [[1, 5], [1, 6], [1, 7], [2, 7]],
-        booked: false,
-      },
-      {
-        size: 4,
-        coordinates: [[2, 1], [3, 1]],
-        booked: true,
-      },
-    ];
-    const newMatrix = getMatrixFromCoordinates(tables, 10, 10);
+    // const tables = [
+    //   {
+    //     size: 2,
+    //     coordinates: [[0, 3]],
+    //     booked: true,
+    //   },
+    //   {
+    //     size: 8,
+    //     coordinates: [[1, 5], [1, 6], [1, 7], [2, 7]],
+    //     booked: false,
+    //   },
+    //   {
+    //     size: 4,
+    //     coordinates: [[2, 1], [3, 1]],
+    //     booked: true,
+    //   },
+    // ];
+    // const newMatrix = getMatrixFromCoordinates(tables, 10, 10);
     this.setState({
-      matrix: newMatrix,
-      tables,
+      matrix: this.props.reservationMatrix,
     });
   }
 
-  onClickTime = (e) => {
-    this.setState({
-      selectedTime: e.target.value,
-    });
-  };
+  // onClickTime = (e) => {
+  //   this.setState({
+  //     selectedTime: e.target.value,
+  //   });
+  // };
 
 
   getClassName = (value) => {
@@ -157,7 +156,7 @@ class OwnerReservationView extends React.Component {
                       color="accent"
                       type="null"
                       value={time}
-                      onClick={e => this.onClickTime(e)}
+                      onClick={e => this.props.onTimeClick(e)}
                     >
                       {time}
                     </Button>
