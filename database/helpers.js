@@ -45,7 +45,7 @@ const addCityToDatabase = (city) => {
 };
 // adds restaurant to the database
 
-const addRestaurantToDataBase = (name, category, address, city, state, zip, phone, url, image, review_count, rating) => {
+const addRestaurantToDataBase = (name, category, address, city, state, zip, phone, url, image, review_count, rating, floorplan) => {
   const data = {
     name,
     category,
@@ -58,23 +58,24 @@ const addRestaurantToDataBase = (name, category, address, city, state, zip, phon
     rating,
     url,
     image,
+    floorplan,
   };
   return Restaurant.forge(data).save().then(restaurant => restaurant);
 };
 
+// Gets restaurant and it's reservations by ID
+const grabRestaurantReservationsById = id => Restaurant.forge().query({ where: { id } }).fetch({ withRelated: ['reservation'] }).then(result => result);
+
+// Gets restaurant and it's reservations by ID
+const grabRestaurantByName = name => Restaurant.forge().query({ where: { name } }).fetch().then(result => result);
+
 // adds reservation to the database
-const addReservationToDatabase = (restaurant_id, isReservationBooked, party_size, customer_id, time) => {
+const addReservationToDatabase = (restaurant_id, isReservationBooked, party_size, customer_id, time, coordinates) => {
   const data = {
-    restaurant_id, isReservationBooked, party_size, customer_id, time,
+    restaurant_id, isReservationBooked, party_size, customer_id, time, coordinates,
   };
   return Reservation.forge(data).save().then(reservation => reservation);
 };
-
-///  Helper functions for owner portal
-
-
-
-
 
 
 module.exports = {
@@ -86,4 +87,6 @@ module.exports = {
   addRestaurantToDataBase,
   addReservationToDatabase,
   addCityToDatabase,
+  grabRestaurantReservationsById,
+  grabRestaurantByName,
 };

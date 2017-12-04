@@ -60,17 +60,17 @@ class OwnerFloorPlan extends React.Component {
     this.state = {
       numRows: 10,
       numCols: 10,
-      matrix: [],
+      matrix: props.matrix,
       tables: [],
     };
   }
 
-  componentDidMount = () => {
-    const newMatrix = generateMatrix(10, 10);
-    this.setState({
-      matrix: newMatrix,
-    });
-  }
+  // componentDidMount = () => {
+  //   const newMatrix = generateMatrix(10, 10);
+  //   this.setState({
+  //     matrix: newMatrix,
+  //   });
+  // }
 
 
   squares() {
@@ -107,17 +107,6 @@ class OwnerFloorPlan extends React.Component {
       matrix: newMatrix,
     });
   }
-
-  onSaveClick = (e) => {
-    e.preventDefault();
-    const tables = generateTables(this.state.matrix);
-    this.setState({
-      tables,
-    });
-    this.props.toggleEditMode();
-    console.log(JSON.stringify(tables));
-  }
- 
 
   render() {
     const { classes } = this.props; 
@@ -160,7 +149,8 @@ class OwnerFloorPlan extends React.Component {
                 raised
                 color="accent"
                 className={classes.button}
-                onClick={e => this.onSaveClick(e)} >
+                onClick={e => this.props.onSaveClick(e, this.state.matrix)}
+              >
                 Save
               </Button>
           </Grid>
