@@ -8,9 +8,13 @@ import indigo from 'material-ui/colors/indigo';
 import red from 'material-ui/colors/red';
 import Search from './Search';
 import AvailableReservations from './AvailableReservations';
-import Myreservations from './Myreservations';
+import MyReservations from './Myreservations';
 import Loader from './Refresh';
 import Confirmation from './ConfirmationPage';
+import Button from 'material-ui/Button';
+import { Switch, Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
+import Avatar from 'material-ui/Avatar';
+import classNames from 'classnames';
 
 const theme = createMuiTheme({
   palette: {
@@ -33,6 +37,18 @@ const styles = theme => ({
     width: '100%',
     height: '100%',
   },
+  avatar: {
+    margin: 5,
+    marginLeft: 10,
+  },
+  bigAvatar: {
+    width: 45,
+    height: 45,
+  },
+  row: {
+    display: 'inline-flex',
+    justifyContent: 'left',
+  },
 });
 
 class Home extends React.Component {
@@ -44,16 +60,17 @@ class Home extends React.Component {
       partySizes: [2, 4, 6, 8],
       categories: ['All'],
       myReservations: [],
+      reservationFilter: 'HIDE',
       phoneNumber: '',
       restaurant: '',
       time: 'All',
       party: 2,
       category: 'All',
-      selectedRestaurant: [],
       isLoading: false,
       reservation: [],
       currUserName: '',
       currUserProfile: '',
+      showReservations: this.props.showReservations,
     };
     this.onAcceptClick = this.onAcceptClick.bind(this);
     this.onFilterSubmitClick = this.onFilterSubmitClick.bind(this);
@@ -69,22 +86,26 @@ class Home extends React.Component {
     axios.get('/facebookData')
       .then((results) => {
         this.setState({
-          currUserName: results.data.currUserName,
-          currUserProfile: results.data.currUserProfile,
-        })
+          currUserProfile: results.data,
+        });
       })
       .catch((err) => {
         console.log('Error getting results', err);
       });
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.showReservations === true) {
+      this.myClick();
+    }
+  }
+
   onStateChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
 
-
   onSearchSubmitClick(city, partySize) {
     this.setState({ isLoading: true });
-    const self = this;
     axios.post('/city', { city })
       .then((results) => {
         if (results) {
@@ -126,7 +147,7 @@ class Home extends React.Component {
           });
         });
         self.setState({
-          myReservations
+          myReservations,
         });
       })
       .catch((err) => {
@@ -151,34 +172,28 @@ class Home extends React.Component {
     });
   }
 
-  onCancelClick(index, reservation) {
-    // send data to bd and repopulate my reservation list
-    const myReservations = this.state.myReservations.slice(0);
-    myReservations.splice(index, 1);
-
-    const restaurants = this.state.data.slice(0);
-    _.forEach(restaurants, (rest) => {
-      if (rest.name === reservation.restaurant) {
-        _.forEach(rest.reservations, (res) => {
-          if (res.id === reservation.id) {
-            res.booked = false;
-          }
-        });
-      }
-    });
-
+  onConfirmationClick(input) {
+    const data = {
+      reservation: this.state.reservation,
+      customerId: this.state.currUserProfile.id,
+      comment: input,
+    };
     this.setState({
-      myReservations,
-      data: restaurants
+      reservation: [],
+      restaurant: ' ',
     });
+    axios.post('/updateReservations', data)
+      .then(result => axios.get('/home'));
+  }
 
-    axios.put('/cancel', {
-      reservationId: reservation.id,
-    })
-      .then(() => console.log('we successfully cancelled a reservation!'))
-      .catch((err) => {
-        throw err;
+  onCancelClick(id) {
+    // send data to bd and repopulate my reservation list
+    axios.put('/cancel', { id }).then((result) => {
+      this.setState({
+        reservationFilter: 'HIDE',
+        myReservations: [],
       });
+    });
   }
 
   filterRestaurants() {
@@ -199,44 +214,78 @@ class Home extends React.Component {
     return filteredData;
   }
 
+  myClick() {
+    this.setState({
+      isLoading: true,
+    });
+    axios.post('/getReservations', this.state.currUserProfile)
+      .then((result) => {
+        this.setState({
+          isLoading: false,
+          reservationFilter: 'SHOW',
+          myReservations: result.data,
+        });
+      });
+  }
 
   render() {
     const { classes } = this.props;
     if (this.state.isLoading) {
       return (
         <MuiThemeProvider theme={theme}>
-        <Loader />
-      </MuiThemeProvider>
+          <Loader />
+        </MuiThemeProvider>
       );
     }
     if (this.state.restaurant.length !== 0) {
-      return ( 
-      <MuiThemeProvider theme={theme}>
-      <Confirmation reservation = {this.state.reservation} restaurant={this.state.restaurant} />
-      </MuiThemeProvider>
+      return (
+        <MuiThemeProvider theme={theme}>
+          <Confirmation reservation={this.state.reservation} restaurant={this.state.restaurant} confirmationClick={this.onConfirmationClick.bind(this)} />
+        </MuiThemeProvider>
+      );
+    }
+    if (this.state.reservationFilter === 'SHOW') {
+      return (
+        <MuiThemeProvider theme={theme}>
+          <MyReservations reservations={this.state.myReservations} onCancelClick={this.onCancelClick.bind(this)} />
+        </MuiThemeProvider>
       );
     }
     return (
       <MuiThemeProvider theme={theme}>
-        <Search
-          phoneNumber={this.state.phoneNumber}
-          times={this.state.times}
-          categories={this.state.categories}
-          onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
-          onSearchSubmitClick={this.onSearchSubmitClick}
-          onFilterSubmitClick={this.onFilterSubmitClick}
-          onStateChange={this.onStateChange}
-        />
-        <AvailableReservations
-          restaurantData={this.filterRestaurants()}
-          onAcceptClick={this.onAcceptClick}
-          time={this.state.time}
-          party={this.state.party}
-        />
-        <Myreservations
-          reservations={this.state.myReservations}
-          onCancelClick={this.onCancelClick}
-        />
+        <div>
+          <br />
+          { (this.state.currUserName.length > 0) ?
+          (
+            <div className={classes.row}>
+              <br />
+          Welcome {this.state.currUserName}!
+              <Avatar
+                src={this.state.currUserProfile}
+                className={classNames(classes.avatar, classes.bigAvatar)}
+              />
+            </div>
+          ) : (
+            <div />
+          )
+        }
+          <br /><br />
+          <Search
+            phoneNumber={this.state.phoneNumber}
+            times={this.state.times}
+            categories={this.state.categories}
+            onPhoneNumberSubmitClick={this.onPhoneNumberSubmitClick}
+            onSearchSubmitClick={this.onSearchSubmitClick}
+            onFilterSubmitClick={this.onFilterSubmitClick}
+            onStateChange={this.onStateChange}
+          />
+          <AvailableReservations
+            restaurantData={this.filterRestaurants()}
+            onAcceptClick={this.onAcceptClick}
+            time={this.state.time}
+            party={this.state.party}
+          />
+        </div>
       </MuiThemeProvider>
     );
   }

@@ -2,8 +2,8 @@ const bookshelf = require('./index').bookshelf;
 const Restaurant = require('./models/Restaurants');
 const Reservation = require('./models/Reservations');
 const SearchedCity = require('./models/SearchedCities');
-const Customer = require('./models/Customers.js');
-
+const Customer = require('./models/Customers');
+const Comment = require('./models/Comments');
 // returns a customer given their Facebook ID
 const grabCustomerByFbId = id => Customer.forge().query({ where: { facebook_id: id } }).fetch();
 
@@ -18,8 +18,8 @@ const addFbCustomerToDataBase = (email, name, user_type, facebook_id) => {
   return Customer.forge(data).save().then(customer => customer);
 };
 
-//returns a customer given their username (email)
-const grabCustomerById = (id, password) => Customer.forge().query({ where: { email: id, password: password } }).fetch();
+// returns a customer given their username (email)
+const grabCustomerById = (id, password) => Customer.forge().query({ where: { email: id, password } }).fetch();
 
 // adds a non-Facebook customer to the database
 const addCustomerToDataBase = (email, name, password, user_type) => {
@@ -33,8 +33,18 @@ const addCustomerToDataBase = (email, name, password, user_type) => {
 };
 
 // updates a customer's choice of user type by Facebook ID
-const updateFbUserType = (id, usertype) => {
-  return Customer.forge().where({facebook_id: id }).save({user_type: usertype}, {patch: true}).then((results) => results);
+const updateFbUserType = (id, usertype) => Customer.forge().where({ facebook_id: id }).save({ user_type: usertype }, { patch: true }).then(results => results);
+
+const updateReservation = (customer_id, id) => Reservation.forge().where({ id }).save({ customer_id, isReservationBooked: true }, { patch: true }).then((results => results));
+
+const createComment = (comments, restaurant_id, customer_id, reservation_id) => {
+  const data = {
+    comments,
+    restaurant_id,
+    customer_id,
+    reservation_id,
+  };
+  return Comment.forge(data).save().then(results => results);
 };
 
 const addCityToDatabase = (city) => {
@@ -77,6 +87,9 @@ const addReservationToDatabase = (restaurant_id, isReservationBooked, party_size
   return Reservation.forge(data).save().then(reservation => reservation);
 };
 
+const grabReservationsByCustomerId = customer_id => Reservation.query({ where: { customer_id } }).fetchAll({ withRelated: ['restaurant'] }).then(results => results);
+
+const cancelReservation = id => Reservation.forge().where({ id }).save({ customer_id: null, isReservationBooked: false }, { patch: true }).then(results => results);
 
 module.exports = {
   addFbCustomerToDataBase,
@@ -89,4 +102,8 @@ module.exports = {
   addCityToDatabase,
   grabRestaurantReservationsById,
   grabRestaurantByName,
+  updateReservation,
+  createComment,
+  grabReservationsByCustomerId,
+  cancelReservation,
 };

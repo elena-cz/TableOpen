@@ -95,7 +95,7 @@ class SearchForm extends React.Component {
             InputLabelProps={{
               shrink: true,
             }}
-            placeholder="San Francisco"
+            placeholder='San Francisco'
             margin="normal"
             value={city}
             onChange={this.onStateChange}
@@ -108,7 +108,7 @@ class SearchForm extends React.Component {
             InputLabelProps={{
               shrink: true,
             }}
-            placeholder="CA"
+            placeholder='CA'
             margin="normal"
             value={state}
             onChange={this.onStateChange}
