@@ -14,6 +14,10 @@ const {
   cancelReservation,
   grabRestaurantByName,
   grabRestaurantReservationsById,
+  updateReservation,
+  createComment,
+  grabReservationsByCustomerId,
+  cancelReservation,
 } = require('../database/helpers.js');
 // const { client } = require('../database/index.js');
 // const twilio = require('../helpers/twilioApi.js');

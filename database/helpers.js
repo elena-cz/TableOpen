@@ -106,4 +106,8 @@ module.exports = {
   cancelReservation,
   grabRestaurantReservationsById,
   grabRestaurantByName,
+  updateReservation,
+  createComment,
+  grabReservationsByCustomerId,
+  cancelReservation,
 };
