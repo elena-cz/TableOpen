@@ -61,13 +61,13 @@ class OwnerReservationView extends React.Component {
     this.state = {
       numRows: 10,
       numCols: 10,
-      matrix: [],
+      // matrix: [],
       // tables: [],
       // selectedTime: '5:00pm',
     };
   }
 
-  componentDidMount = () => {
+  // componentDidMount = () => {
     // const tables = [
     //   {
     //     size: 2,
@@ -86,10 +86,10 @@ class OwnerReservationView extends React.Component {
     //   },
     // ];
     // const newMatrix = getMatrixFromCoordinates(tables, 10, 10);
-    this.setState({
-      matrix: this.props.reservationMatrix,
-    });
-  }
+  //   this.setState({
+  //     matrix: this.props.reservationMatrix,
+  //   });
+  // }
 
   // onClickTime = (e) => {
   //   this.setState({
@@ -111,8 +111,8 @@ class OwnerReservationView extends React.Component {
 
 
   squares = () => {
-    const { numRows, numCols, matrix } = this.state;
-    const { classes } = this.props;
+    const { numRows, numCols } = this.state;
+    const { classes, matrix } = this.props;
 
     if (matrix.length === 0) {
       return null;
@@ -156,7 +156,7 @@ class OwnerReservationView extends React.Component {
                       color="accent"
                       type="null"
                       value={time}
-                      onClick={e => this.props.onTimeClick(e)}
+                      onClick={() => this.props.onTimeClick(time)}
                     >
                       {time}
                     </Button>

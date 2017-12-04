@@ -81,14 +81,12 @@ export const generateMatrix = (numRows, numCols) => {
 export const getMatrixFromCoordinates = (tables, time, numRows, numCols) => {
   const matrix = generateMatrix(numRows, numCols);
   tables.forEach((table) => {
-    console.log('table', table);
     if (`${table.time}pm` === time) {
       const coordinates = JSON.parse(table.coordinates);
       coordinates.forEach((coordinate) => {
         const [row, col] = coordinate;
-        matrix[row][col] = (table.booked) ? 2 : 1;
+        matrix[row][col] = (table.isReservationBooked) ? 2 : 1;
       });
-      
     }
   });
   return matrix;
