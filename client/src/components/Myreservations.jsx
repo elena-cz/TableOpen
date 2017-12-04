@@ -1,25 +1,51 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MyReservation from './Myreservation.jsx';
+import MyReservation from './Myreservation';
+import { withStyles } from 'material-ui/styles';
+import Paper from 'material-ui/Paper';
+import Grid from 'material-ui/Grid';
+import Typography from 'material-ui/Typography';
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    padding: 16,
+  },
+  paper: {
+    marginTop: 30,
+    padding: 16,
+    color: theme.palette.text.primary,
+  },
+});
+
 
 const MyReservations = props => (
-
-  <div className="myReservations">
-  My Reservations
-    {(props.reservations.length === 0) ?
-      <div>No Reservations</div> : props.reservations.map((reservation, idx) =>
-        (
-          <MyReservation
-            reservation={reservation}
-            key={reservation.id}
-            index={idx}
-            cancel={props.onCancelClick}
-          />
-        ))}
-  </div>
+  <Paper className={props.classes.paper}>
+    <Grid
+      className={props.classes.root}
+      container
+      spacing={24}
+    >
+      <div className="myReservations">
+      <Typography type="title" gutterBottom>
+        My Reservations
+      </Typography>
+        {(props.reservations.length === 0) ?
+          <div>No Reservations</div> : props.reservations.map((reservation, idx) =>
+            (
+              <MyReservation
+                reservation={reservation}
+                key={reservation.id}
+                index={idx}
+                cancel={props.onCancelClick}
+              />
+            ))}
+      </div>
+    </Grid>
+  </Paper>
 );
 
-export default MyReservations;
+export default withStyles(styles)(MyReservations);
 
 MyReservations.propTypes = {
   onCancelClick: PropTypes.func.isRequired,

@@ -114,6 +114,11 @@ app.get('/home', (req, res) => {
   res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
 });
 
+app.get('/manager', (req, res) => {
+  res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
+});
+
+
 app.get('/error', (req, res) => {
   res.sendFile(path.join(__dirname, '/../client/dist/index.html'));    
 });
