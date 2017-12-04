@@ -268,7 +268,6 @@ app.post('/user', (request, response) => {
 // Owner portal routes
 
 app.post('/restaurants', (request, response) => {
-  console.log('post to restaurants', request.body);
   saveNewRestaurant(request.body)
     .then(results => response.send(results.rows));
 });
@@ -279,7 +278,7 @@ app.post('/restaurants/:restaurantId/reservations', (request, response) => {
 });
 
 app.get('/restaurants/:restaurantId/reservations', (request, response) => {
-  grabRestaurantReservationsById(request.params.restaurantId)
+  return grabRestaurantReservationsById(request.params.restaurantId)
     .then(results => response.send(results));
 });
 

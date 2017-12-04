@@ -60,7 +60,17 @@ class OwnerPortal extends React.Component {
             restaurantId: result.data.id,
             // matrix: result.data.floorplan,
             matrix: JSON.parse(result.data.floorplan),
+
           });
+          console.log('in componentDidMount');
+            axios.get(`/restaurants/${this.state.restaurantId}/reservations`)
+              .then((data) => {
+                console.log('data.reservations', data.data.reservation);
+                this.setState({
+                  reservations: data.data.reservation,
+                });
+                this.getMatrixForTime(data.data.reservation, '5:00pm', 10, 10);
+              });
         } else {
           const newMatrix = generateMatrix(10, 10);
           this.setState({
@@ -80,17 +90,7 @@ class OwnerPortal extends React.Component {
             review_count: 406,
             rating: 5.0,
             floorplan: JSON.stringify(newMatrix),
-          })
-            .then(() => {
-              axios.get(`/restaurants/${this.state.restaurantId}/reservations`)
-                .then((data) => {
-                  console.log('data.reservations', data.reservations);
-                  this.setState({
-                    reservations: data.reservation,
-                  });
-                  this.getMatrixForTime(data.reservation, '5:00pm', 10, 10);
-                });
-            });
+          });
         }
       });
   }
@@ -102,8 +102,7 @@ class OwnerPortal extends React.Component {
     });
   }
 
-  onTimeClick = (e) => {
-    const time = e.target.value;
+  onTimeClick = (time) => {
     console.log(time);
     this.setState({
       selectedTime: time,
@@ -176,7 +175,7 @@ class OwnerPortal extends React.Component {
              />
             : <OwnerReservationView
               onTimeClick={this.onTimeClick}
-              reservationMatrix={this.state.reservationMatrix}
+              matrix={this.state.reservationMatrix}
               times={times} />
           }
       </div>
