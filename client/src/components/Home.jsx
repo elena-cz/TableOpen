@@ -2,36 +2,31 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import _ from 'underscore';
-import { MuiThemeProvider, createMuiTheme, withStyles } from 'material-ui/styles';
-import pink from 'material-ui/colors/pink';
-import indigo from 'material-ui/colors/indigo';
-import red from 'material-ui/colors/red';
-import Search from './Search';
-import AvailableReservations from './AvailableReservations';
-import Myreservations from './Myreservations';
-import Loader from './Refresh';
-import Confirmation from './ConfirmationPage';
-
-const theme = createMuiTheme({
-  palette: {
-    // primary: pink['800'],
-    primary: {
-      ...pink,
-      500: '#ad1457',
-    },
-    secondary: {
-      ...indigo,
-      A700: '#304ffe',
-    },
-    error: red,
-  },
-});
+import { withStyles } from 'material-ui/styles';
+import { Switch, Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
+import Search from './Search.jsx';
+import AvailableReservations from './AvailableReservations.jsx';
+import Myreservations from './Myreservations.jsx';
+import Avatar from 'material-ui/Avatar';
+import classNames from 'classnames';
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
     width: '100%',
     height: '100%',
+  },
+  avatar: {
+    margin: 5,
+    marginLeft: 10,
+  },
+  bigAvatar: {
+    width: 45,
+    height: 45,
+  },
+  row: {
+    display: 'inline-flex',
+    justifyContent: 'left',
   },
 });
 
@@ -217,7 +212,24 @@ class Home extends React.Component {
       );
     }
     return (
-      <MuiThemeProvider theme={theme}>
+      <div>
+      <br/>
+        { (this.state.currUserName.length > 0) ? 
+          ( 
+          <div className={classes.row}>
+          <br/>
+          Welcome {this.state.currUserName}!
+          <Avatar
+          src={this.state.currUserProfile}
+          className={classNames(classes.avatar, classes.bigAvatar)}
+          />
+          </div>
+          ) : (
+          <div>
+          </div>
+          )
+        }
+        <br/><br/>
         <Search
           phoneNumber={this.state.phoneNumber}
           times={this.state.times}
@@ -237,7 +249,7 @@ class Home extends React.Component {
           reservations={this.state.myReservations}
           onCancelClick={this.onCancelClick}
         />
-      </MuiThemeProvider>
+        </div>
     );
   }
 }

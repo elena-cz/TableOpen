@@ -48,6 +48,7 @@ app.get('/facebookData', (req, res) => {
  
 app.post('/typeof', jsonParser, (req, res) => {
   currType = req.body.type;
+  console.log('req.body.type');
   res.end();
 });
 
@@ -201,7 +202,7 @@ passport.use('local-signup', new Strategy({
   },
   function(req, username, password, done) {
     currUserName = req.body.name;
-    addCustomerToDataBase(username, req.body.name, password, req.body.usertype[0])
+    addCustomerToDataBase(username, req.body.name, password, req.body.usertype)
     .then(user => {
       return done(null, user);
     })
