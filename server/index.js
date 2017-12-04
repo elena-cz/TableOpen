@@ -8,6 +8,10 @@ const {
   updateFbUserType,
   addCustomerToDataBase,
   grabCustomerById,
+  updateReservation,
+  createComment,
+  grabReservationsByCustomerId,
+  cancelReservation,
 } = require('../database/helpers.js');
 // const { client } = require('../database/index.js');
 // const twilio = require('../helpers/twilioApi.js');
@@ -18,7 +22,6 @@ const {
   generateReservationTimes,
   getCustomerReservations,
   bookReservation,
-  cancelReservation,
   alreadySearched,
 } = require('../helpers/utils.js');
 
@@ -42,14 +45,6 @@ let currFriends = '';
 let currType = 'customer';
 let currPassword = '';
 
-app.get('/facebookData', (req, res) => {
-  res.send({currUserName: currUserName, currUserProfile: currUserProfile});
-});
- 
-app.post('/typeof', jsonParser, (req, res) => {
-  currType = req.body.type;
-  res.end();
-});
 
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
@@ -62,6 +57,32 @@ app.use(express.static(path.join(__dirname, '/../client/dist')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.get('/facebookData', (req, res) => {
+  res.status(200);
+  res.send(req.user);
+});
+
+app.post('/updateReservations', (req, res) => {
+  console.log(req.body);
+  updateReservation(req.body.customerId, req.body.reservation.id).then((result) => {
+    return createComment(req.body.comment, req.body.reservation.restaurant_id, req.body.customerId, req.body.reservation.id)
+  }).then((result) => {
+    res.status(200);
+    res.send(result);
+  });
+});
+
+app.post('/getReservations', (req, res) => {
+  grabReservationsByCustomerId(req.body.id).then((result) => {
+    res.status(200);
+    res.send(result);
+  });
+});
+
+app.post('/typeof', jsonParser, (req, res) => {
+  currType = req.body.type;
+  res.end();
+});
 // Get restaurants and reservations for a particular city
 app.post('/city', (request, response) => {
   // Check whether we have previously queried Yelp for this city
@@ -91,10 +112,8 @@ app.post('/reservations', (req, res) => {
   city = city.split(' ');
   if (city.length > 1) {
     var formattedCity = `${city[0]} ${city[1].slice(0, 1).toUpperCase() + city[1].slice(1, city[1].length)}`;
-    console.log(formattedCity);
   } else {
-    var formattedCity = city.join(' ');
-    console.log(formattedCity);    
+    var formattedCity = city.join(' ');    
   }
   queryDatabaseForCity(formattedCity, req.body.partySize).then((data) => {
     res.status(200);
@@ -226,33 +245,17 @@ app.get('/logout', function(req, res) {
   res.redirect('/');
 });
 
-// initialize the database with a yelp query for 1000 SF restaurants
-// seedDatabase();
-
-// const visitedCities = ['San Francisco, CA'];
-
-// App will initially load with SF as the default city
-app.get('/data', (request, response) => {
-  queryDatabaseForCity()
-    .then(cityResults => response.send(formatCityResults(cityResults)))
-    .catch((err) => {
-      throw err;
-    });
+app.put('/cancel', (req, res) => {
+  console.log('cancel');
+  cancelReservation(req.body.id).then((result) => {
+    res.status(200);
+    res.send(true);
+  });
 });
 
-app.post('/book', (request, response) => {
-  bookReservation(request.body.reservationId, request.body.phoneNumber)
-    .then(results => response.send(results.rows));
-});
-
-app.put('/cancel', (request, response) => {
-  cancelReservation(request.body.reservationId)
-    .then(results => response.send(results.rows));
-});
-
-app.post('/user', (request, response) => {
-  getCustomerReservations(request.body.phoneNumber)
-    .then(results => response.send(results.rows));
-});
+// app.post('/user', (req, res) => {
+//   getCustomerReservations(req.body.phoneNumber)
+//     .then(results => res.send(results.rows));
+// });
 
 app.listen(PORT, () => console.log(`The TableOpen server is listening on port ${PORT}!`));

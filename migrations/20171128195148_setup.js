@@ -12,12 +12,11 @@ exports.up = (knex, Promise) => Promise.all([
     table.string('image');
     table.integer('review_count');
     table.decimal('rating', 2, 1);
-    table.text('comments', 'longtext');
   }).createTable('customers', (table) => {
     table.increments('id').primary();
     table.string('phone');
     table.string('name');
-    table.string('email');
+    table.string('email').unique();
     table.string('password');
     table.string('user_type');
     table.string('facebook_id');
@@ -31,6 +30,12 @@ exports.up = (knex, Promise) => Promise.all([
   }).createTable('searched_cities', (table) => {
     table.increments('id').primary();
     table.string('city');
+  }).createTable('comments', (table) => {
+    table.increments('id').primary();
+    table.text('comments', 'longtext');
+    table.integer('restaurant_id').references('restaurants.id');
+    table.integer('customer_id').references('customers.id');
+    table.integer('reservation_id').references('reservations.id');
   }),
 ]);
 

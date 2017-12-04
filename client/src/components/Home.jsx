@@ -8,9 +8,10 @@ import indigo from 'material-ui/colors/indigo';
 import red from 'material-ui/colors/red';
 import Search from './Search';
 import AvailableReservations from './AvailableReservations';
-import Myreservations from './Myreservations';
+import MyReservations from './Myreservations';
 import Loader from './Refresh';
 import Confirmation from './ConfirmationPage';
+import Button from 'material-ui/Button';
 
 const theme = createMuiTheme({
   palette: {
@@ -44,12 +45,12 @@ class Home extends React.Component {
       partySizes: [2, 4, 6, 8],
       categories: ['All'],
       myReservations: [],
+      reservationFilter: 'HIDE',
       phoneNumber: '',
       restaurant: '',
       time: 'All',
       party: 2,
       category: 'All',
-      selectedRestaurant: [],
       isLoading: false,
       reservation: [],
       currUserName: '',
@@ -68,10 +69,10 @@ class Home extends React.Component {
   componentDidMount() {
     axios.get('/facebookData')
       .then((results) => {
+        console.log(results);
         this.setState({
-          currUserName: results.data.currUserName,
-          currUserProfile: results.data.currUserProfile,
-        })
+          currUserProfile: results.data,
+        });
       })
       .catch((err) => {
         console.log('Error getting results', err);
@@ -126,7 +127,7 @@ class Home extends React.Component {
           });
         });
         self.setState({
-          myReservations
+          myReservations,
         });
       })
       .catch((err) => {
@@ -151,34 +152,28 @@ class Home extends React.Component {
     });
   }
 
-  onCancelClick(index, reservation) {
-    // send data to bd and repopulate my reservation list
-    const myReservations = this.state.myReservations.slice(0);
-    myReservations.splice(index, 1);
-
-    const restaurants = this.state.data.slice(0);
-    _.forEach(restaurants, (rest) => {
-      if (rest.name === reservation.restaurant) {
-        _.forEach(rest.reservations, (res) => {
-          if (res.id === reservation.id) {
-            res.booked = false;
-          }
-        });
-      }
-    });
-
+  onConfirmationClick(input) {
+    const data = {
+      reservation: this.state.reservation,
+      customerId: this.state.currUserProfile.id,
+      comment: input,
+    };
     this.setState({
-      myReservations,
-      data: restaurants
+      reservation: [],
+      restaurant: ' ',
     });
+    axios.post('/updateReservations', data)
+      .then(result => console.log(result));
+  }
 
-    axios.put('/cancel', {
-      reservationId: reservation.id,
-    })
-      .then(() => console.log('we successfully cancelled a reservation!'))
-      .catch((err) => {
-        throw err;
+  onCancelClick(id) {
+    // send data to bd and repopulate my reservation list
+    axios.put('/cancel', {id}).then((result) => {
+      this.setState({
+        reservationFilter: 'HIDE',
+        myReservations: [],
       });
+    });
   }
 
   filterRestaurants() {
@@ -199,25 +194,53 @@ class Home extends React.Component {
     return filteredData;
   }
 
+  myClick() {
+    this.setState({
+      isLoading: true,
+    });
+    axios.post('/getReservations', this.state.currUserProfile)
+      .then((result) => {
+        this.setState({
+          isLoading: false,
+          reservationFilter: 'SHOW',
+          myReservations: result.data,
+        });
+      });
+  }
 
   render() {
     const { classes } = this.props;
     if (this.state.isLoading) {
       return (
         <MuiThemeProvider theme={theme}>
-        <Loader />
-      </MuiThemeProvider>
+          <Loader />
+        </MuiThemeProvider>
       );
     }
     if (this.state.restaurant.length !== 0) {
-      return ( 
-      <MuiThemeProvider theme={theme}>
-      <Confirmation reservation = {this.state.reservation} restaurant={this.state.restaurant} />
-      </MuiThemeProvider>
+      return (
+        <MuiThemeProvider theme={theme}>
+          <Confirmation reservation={this.state.reservation} restaurant={this.state.restaurant} confirmationClick={this.onConfirmationClick.bind(this)} />
+        </MuiThemeProvider>
+      );
+    }
+    if (this.state.reservationFilter === 'SHOW') {
+      return (
+        <MuiThemeProvider theme={theme}>
+          <MyReservations reservations={this.state.myReservations} onCancelClick={this.onCancelClick.bind(this)} />
+        </MuiThemeProvider>
       );
     }
     return (
       <MuiThemeProvider theme={theme}>
+        <Button
+          onClick={this.myClick.bind(this)}
+          raised
+          color="accent"
+          className={classes.button}
+        >
+          My Reservations
+        </Button>
         <Search
           phoneNumber={this.state.phoneNumber}
           times={this.state.times}
@@ -232,10 +255,6 @@ class Home extends React.Component {
           onAcceptClick={this.onAcceptClick}
           time={this.state.time}
           party={this.state.party}
-        />
-        <Myreservations
-          reservations={this.state.myReservations}
-          onCancelClick={this.onCancelClick}
         />
       </MuiThemeProvider>
     );

@@ -17,6 +17,10 @@ const styles = theme => ({
     flex: 1,
     color: 'white',
     fontFamily: 'Roboto Slab, serif',
+    textDecoration: 'none',
+  },
+  header: {
+    textDecoration: 'none',
   },
 });
 
@@ -27,9 +31,8 @@ function TopMenu(props) {
       <AppBar position="static">
         <Toolbar>
           <Typography type="title" color="inherit" className={classes.title}>
-            TableOpen
+            <a href="/home" className={classes.title}> TableOpen </a>
           </Typography>
-          <Button color="contrast">My Reservations</Button>
         </Toolbar>
       </AppBar>
     </div>

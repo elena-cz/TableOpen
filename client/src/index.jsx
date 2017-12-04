@@ -16,6 +16,9 @@ import Home from './components/Home.jsx';
 import SignUp from './components/SignUp.jsx';
 import TopMenu from './components/TopMenu';
 import LoginError from './components/Error.jsx';
+import Confirmation from './components/ConfirmationPage.jsx';
+import MyReservations from './components/myreservations.jsx';
+
 // Global theme
 
 const theme = createMuiTheme({
@@ -35,7 +38,7 @@ const theme = createMuiTheme({
 
 
 class App extends React.Component {
-
+  
   render() {
     const { classes } = this.props;
     return (
@@ -47,6 +50,9 @@ class App extends React.Component {
         <Route path='/home' component={Home}/>
         <Route path='/signup' component={SignUp}/>
         <Route path='/error' component={LoginError}/>
+        <Route path='/confirmation' component={Confirmation}/>
+        <Route path='/reservations' component={MyReservations}/>
+
       </div>
       </Router>
      </MuiThemeProvider>
